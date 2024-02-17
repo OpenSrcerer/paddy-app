@@ -3,7 +3,16 @@
   "appName": "Paddy",
   "webDir": "www",
   "server": {
-    "androidScheme": "https",
-    "url": "http://192.168.2.102:9500"
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "BluetoothLe": {
+      "displayStrings": {
+        "scanning": "Scanning...",
+        "cancel": "Cancel",
+        "availableDevices": "Available devices",
+        "noDeviceFound": "No device found"
+      }
+    }
   }
 }

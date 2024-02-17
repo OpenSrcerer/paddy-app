@@ -37,6 +37,9 @@
     </application>
 
     <!-- Permissions -->
-
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- BLE Permissions https://github.com/capacitor-community/bluetooth-le?tab=readme-ov-file#android -->
+  <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+                   android:usesPermissionFlags="neverForLocation"/>
 </manifest>

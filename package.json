@@ -12,8 +12,10 @@
     "dev": "quasar dev",
     "build": "quasar build",
     "build:pwa": "quasar build -m pwa",
-    "build:android": "quasar dev -m capacitor -T android",
-    "build:ios": "quasar dev -m capacitor -T ios"
+    "sync:capacitor": "cd src-capacitor && npx cap sync && cd ..",
+    "build:android": "npm run sync:capacitor && quasar dev -m capacitor -T android",
+    "build:ios": "npm run sync:capacitor && quasar dev -m capacitor -T ios",
+    "release:android": "npm run sync:capacitor && quasar build -m capacitor -T android"
   },
   "dependencies": {
     "@capacitor-community/bluetooth-le": "^3.1.1",
