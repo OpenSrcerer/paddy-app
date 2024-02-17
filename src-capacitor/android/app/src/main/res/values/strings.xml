@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Paddy</string>
+    <string name="title_activity_main">Paddy</string>
+    <string name="package_name">online.danielstefani.paddy</string>
+    <string name="custom_url_scheme">online.danielstefani.paddy</string>
+</resources>
