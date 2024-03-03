@@ -29,7 +29,8 @@ export abstract class AbstractBackendClient {
     const requestConfig = {
       method: verb,
       headers: AbstractBackendClient.jwt ?
-        { Authorization: AbstractBackendClient.jwt } : { },
+        { "Content-Type": "application/json", Authorization: AbstractBackendClient.jwt } :
+        { "Content-Type": "application/json" },
       url: `${AbstractBackendClient.API_BASE_URL}/${this.replacePathParams(path, pathParams)}`,
       params: queryParams ?? {},
       data: body

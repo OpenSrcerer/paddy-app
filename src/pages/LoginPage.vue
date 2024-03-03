@@ -5,7 +5,7 @@
       <input type="text" v-model="emailOrUsernameForm"><br><br>
 
       <label>Password:</label>
-      <input type="text" v-model="passwordForm"><br><br>
+      <input type="password" v-model="passwordForm"><br><br>
 
       <button type="button" @click="onLogin">Login</button>
     </div>
@@ -40,7 +40,6 @@ const passwordForm = ref()
 const alert = ref(false)
 const alertText = ref("")
 
-
 const onLogin = async () => {
   try {
     await session.doLogin(emailOrUsernameForm.value, passwordForm.value)
@@ -53,5 +52,9 @@ const onLogin = async () => {
 </script>
 
 <style scoped lang="scss">
-
+#container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 </style>
