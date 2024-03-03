@@ -1,19 +1,15 @@
 import axios, { isAxiosError, Method } from 'axios';
-import crypto from 'crypto';
 import { isRetriesExceeded, RetriesExceededError } from 'src/backend/RetriesExceededError';
 import { SessionRoute } from 'src/backend/session/SessionRoute.enum';
 import { LoginResponseDto } from 'src/backend/session/dto/LoginResponseDto';
+import { PaddyRes } from 'src/backend/PaddyRes';
+import { pbkdf2 } from 'src/backend/WebCryptoPbkdf2';
 
 export abstract class AbstractBackendClient {
 
   private static API_BASE_URL = 'https://mqtt.danielstefani.online/api/v1'
   private static API_BACKOFF_TIME_MS = 3000
   private static API_MAX_RETRIES = 3
-
-  // ---- For password hashing ----
-  private static PBKDF2_ALGORITHM = 'sha512'
-  private static PBKDF2_ITERATIONS = 210000 // From OWASP
-  private static PBKDF2_KEY_LENGTH = 256 // Bits
 
   // ---- User Credentials that should be updated every login/logout ----
   private static emailOrUsername: string | null = null
@@ -29,7 +25,7 @@ export abstract class AbstractBackendClient {
     queryParams: Record<string, string> | null = null,
     body: Record<string, string> | null = null,
     retryCounter = 0
-  ): Promise<T> {
+  ): Promise<PaddyRes<T>> {
     const requestConfig = {
       method: verb,
       headers: AbstractBackendClient.jwt ?
@@ -52,7 +48,14 @@ export abstract class AbstractBackendClient {
       }
 
       const res = await axios.request(requestConfig)
-      return res.data
+
+      console.log(
+        `[BACKEND] Response /${path}\n---------------------------------------\nCode:`,
+        `${res?.status}\nHeaders:`,
+        !!res?.headers ? `${res?.headers}\nBody:` : "<empty>\nBody:",
+        !!res?.data ? res?.data : "<empty>")
+
+      return { code: res.status, body: res.data }
 
     } catch (error: unknown) {
 
@@ -67,22 +70,23 @@ export abstract class AbstractBackendClient {
           !!error?.response?.headers ? `${error?.response?.headers}\nBody:` : "<empty>\nBody:",
           !!error?.response?.data ? error?.response?.data : "<empty>")
 
+        // Refresh JWT
         if (error?.response?.status === 401) {
-          await this.handleUnauthorized()
+          await this.login()
         }
 
-        return this.request(verb, path, pathParams,
-          queryParams, body, retryCounter + 1)
+        return { code: error?.response?.status ?? 0, body: undefined }
       }
 
-      throw error // Weird scenario
+      return this.request(verb, path, pathParams,
+        queryParams, body, retryCounter + 1)
     }
   }
 
   // Get a new JWT if the user credentials are set
-  private async handleUnauthorized() {
+  private async login() {
     if (!AbstractBackendClient.emailOrUsername || !AbstractBackendClient.passwordHash) {
-      throw new Error("Identifier or password missing... cannot retrieve jwt!")
+      throw new Error("Credentials missing missing... cannot retrieve jwt!")
     }
 
     // Retrieves the jwt
@@ -93,7 +97,15 @@ export abstract class AbstractBackendClient {
       }
     )
 
-    AbstractBackendClient.jwt = res?.jwt ?? null
+    if (res.code == 404) {
+      throw new Error("User not found, please try again.")
+    }
+
+    if (res.code == 403) {
+      throw new Error("Invalid password provided, please try again.")
+    }
+
+    AbstractBackendClient.jwt = res?.body?.jwt ?? null
   }
 
   private replacePathParams(path: string, pathParams: Record<string, string> | null) {
@@ -114,16 +126,12 @@ export abstract class AbstractBackendClient {
   Be careful with the user password, it should never
   leave this function un-hashed!
    */
-  private updateUserCredentials(usernameOrEmail: string, rawPassword: string) {
+  protected async updateUserCredentials(usernameOrEmail: string, rawPassword: string) {
+    const derivedKey = await pbkdf2(rawPassword) // Base64
+
     AbstractBackendClient.emailOrUsername = usernameOrEmail
+    AbstractBackendClient.passwordHash = derivedKey
 
-    const onHashedPassword = (err: Error | null, derivedKey: Buffer) => {
-      if (err) throw err;
-      AbstractBackendClient.passwordHash = derivedKey.toString('base64')
-    }
-
-    crypto.pbkdf2(rawPassword, '' /* (salt on server) */,
-      AbstractBackendClient.PBKDF2_ITERATIONS, AbstractBackendClient.PBKDF2_KEY_LENGTH / 8,
-      AbstractBackendClient.PBKDF2_ALGORITHM, onHashedPassword)
+    await this.login()
   }
 }
