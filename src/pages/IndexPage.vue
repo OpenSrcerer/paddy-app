@@ -18,9 +18,12 @@
 import BLESetupButton from 'components/BLESetupButton.vue';
 import { ref } from 'vue';
 import { sendSsidAndPass } from 'src/bluetooth/BLEService';
+import pad from 'src/backend/pad/PadPaddyBackendClient';
 
 const ssidForm = ref()
 const passForm = ref()
+
+pad.getAllUserPads()
 
 const injectCredentials = () => {
   sendSsidAndPass(ssidForm.value, passForm.value)
