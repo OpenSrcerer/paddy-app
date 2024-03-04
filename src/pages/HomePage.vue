@@ -1,10 +1,10 @@
 <template>
   <q-page class="row items-center justify-evenly">
     <div id="container">
-      <h5>Your Pads:</h5>
+      <h5>Your Daemons:</h5>
 
-      <button v-for="pad in pads" :key="pad.id" type="button" @click="onPadClick(pad.id)">
-        Paddy {{ pad.id }}
+      <button v-for="daemon in daemons" :key="daemon.id" type="button" @click="onDaemonClick(daemon.id)">
+        Daemon {{ daemon.id }}
       </button>
     </div>
   </q-page>
@@ -12,19 +12,19 @@
 
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue';
-import { Pad } from 'src/backend/pad/dto/Pad';
-import pad from 'src/backend/pad/PadPaddyBackendClient';
+import { Daemon } from 'src/backend/daemon/dto/Daemon';
+import daemon from 'src/backend/daemon/DaemonPaddyBackendClient';
 import { useRouter } from 'vue-router';
 
 const router = useRouter()
-const pads = ref<Array<Pad>>([])
+const daemons = ref<Array<Daemon>>([])
 
 onBeforeMount(async () => {
-  pads.value = await pad.getAllUserPads()
+  daemons.value = await daemon.getAllUserDaemons()
 })
 
-const onPadClick = (padId: number) => {
-  router.push(`pad/${padId}`)
+const onDaemonClick = (daemonId: number) => {
+  router.push(`daemon/${daemonId}`)
 }
 
 </script>
