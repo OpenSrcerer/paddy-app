@@ -53,8 +53,8 @@ export abstract class AbstractBackendClient {
       console.log(
         `[BACKEND] Response /${path}\n---------------------------------------\nCode:`,
         `${res?.status}\nHeaders:`,
-        !!res?.headers ? `${res?.headers}\nBody:` : "<empty>\nBody:",
-        !!res?.data ? res?.data : "<empty>")
+        !!res?.headers ? `${JSON.stringify(res?.headers)}\nBody:` : "<empty>\nBody:",
+        !!res?.data ? JSON.stringify(res?.data) : "<empty>")
 
       return { code: res.status, body: res.data }
 
@@ -68,8 +68,8 @@ export abstract class AbstractBackendClient {
         console.log(
           `[BACKEND] Error on /${path} <${retryCounter + 1}/${AbstractBackendClient.API_MAX_RETRIES}>\n---------------------------------------\nCode:`,
           `${error?.response?.status}\nHeaders:`,
-          !!error?.response?.headers ? `${error?.response?.headers}\nBody:` : "<empty>\nBody:",
-          !!error?.response?.data ? error?.response?.data : "<empty>")
+          !!error?.response?.headers ? `${JSON.stringify(error?.response?.headers)}\nBody:` : "<empty>\nBody:",
+          !!error?.response?.data ? JSON.stringify(error?.response?.data) : "<empty>")
 
         // Refresh JWT
         if (error?.response?.status === 401) {

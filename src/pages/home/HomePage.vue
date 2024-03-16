@@ -6,6 +6,10 @@
       <button v-for="daemon in daemons" :key="daemon.id" type="button" @click="onDaemonClick(daemon.id)">
         Daemon {{ daemon.id }}
       </button>
+
+      <br><br>
+
+      <button @click="onAddNew">Add New</button>
     </div>
   </q-page>
 </template>
@@ -23,9 +27,8 @@ onBeforeMount(async () => {
   daemons.value = await daemon.getAllUserDaemons()
 })
 
-const onDaemonClick = (daemonId: number) => {
-  router.push(`daemon/${daemonId}`)
-}
+const onAddNew      = ()                 => router.push(`setup`)
+const onDaemonClick = (daemonId: number) => router.push(`daemon/${daemonId}`)
 
 </script>
 

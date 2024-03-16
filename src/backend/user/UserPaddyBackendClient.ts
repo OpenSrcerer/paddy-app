@@ -4,7 +4,5 @@ class UserPaddyBackendClient extends AbstractBackendClient {
 
   constructor() { super(); }
 
-
-
 }
 

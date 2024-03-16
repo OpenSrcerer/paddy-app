@@ -43,7 +43,7 @@ const alertText = ref("")
 const onLogin = async () => {
   try {
     await session.doLogin(emailOrUsernameForm.value, passwordForm.value)
-    await router.push("/home")
+    await router.replace("/home")
   } catch (ex: any) {
     alertText.value = ex.message
     alert.value = true
