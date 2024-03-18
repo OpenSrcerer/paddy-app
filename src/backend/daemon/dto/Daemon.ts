@@ -1,5 +1,7 @@
 export type CreateDaemonResponse = Daemon & { jwt: string }
 
 export type Daemon = {
-  id: string
+  id: string,
+  on: boolean,
+  lastPing: number
 }

@@ -6,14 +6,19 @@ class DaemonPaddyBackendClient extends AbstractBackendClient {
 
   constructor() { super(); }
 
-  async createDaemon(id: string): Promise<CreateDaemonResponse | undefined> {
-    const res = await this.request<CreateDaemonResponse>("POST", DaemonRoute.CREATE_DAEMON, { id })
+  async getDaemon(id: string): Promise<Daemon | undefined> {
+    const res = await this.request<Daemon>("GET", DaemonRoute.GET_DAEMON, { id })
     return res.body ?? undefined
   }
 
   async getAllUserDaemons(): Promise<Array<Daemon>> {
     const res = await this.request<Array<Daemon>>("GET", DaemonRoute.GET_ALL_USER_DAEMONS)
     return res.body ?? []
+  }
+
+  async createDaemon(id: string): Promise<CreateDaemonResponse | undefined> {
+    const res = await this.request<CreateDaemonResponse>("POST", DaemonRoute.CREATE_DAEMON, { id })
+    return res.body ?? undefined
   }
 
   async toggle(id: string) {
