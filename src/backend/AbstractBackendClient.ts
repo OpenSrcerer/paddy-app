@@ -87,7 +87,7 @@ export abstract class AbstractBackendClient {
   // Get a new JWT if the user credentials are set
   private async login() {
     if (!AbstractBackendClient.emailOrUsername || !AbstractBackendClient.passwordHash) {
-      throw new Error("Credentials missing missing... cannot retrieve jwt!")
+      throw new Error("Credentials missing... cannot retrieve jwt!")
     }
 
     // Retrieves the jwt
