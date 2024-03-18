@@ -1,41 +1,9 @@
-# Paddy (paddy-app)
+> ⚠️ Documentation is still WIP. Expect more updates around May.
 
-A Quasar Project
+# Paddy App
 
-## Install the dependencies
-```bash
-yarn
-# or
-npm install
-```
+This is the user interface component for Paddy, the Power Administration Daemon.
 
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
-```bash
-quasar dev
-```
+It uses [Quasar](https://quasar.dev/), with Capacitor for mobile deployment, and the [BLE Capacitor plugin](https://github.com/capacitor-community/bluetooth-le) to interface with the Daemon(s).
 
-
-### Lint the files
-```bash
-yarn lint
-# or
-npm run lint
-```
-
-
-### Format the files
-```bash
-yarn format
-# or
-npm run format
-```
-
-
-
-### Build the app for production
-```bash
-quasar build
-```
-
-### Customize the configuration
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
+The job of this application is to serve as a neat user interface for managing Daemons in their whole lifecycle, including setup, toggling, power measurement, statistics and any necessary error handling.
