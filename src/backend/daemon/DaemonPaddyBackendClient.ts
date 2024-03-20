@@ -17,7 +17,7 @@ class DaemonPaddyBackendClient extends AbstractBackendClient {
   }
 
   async createDaemon(id: string): Promise<CreateDaemonResponse | undefined> {
-    const res = await this.request<CreateDaemonResponse>("POST", DaemonRoute.CREATE_DAEMON, { id })
+    const res = await this.request<CreateDaemonResponse>("POST", DaemonRoute.CREATE_DAEMON, null, null, { id })
     return res.body ?? undefined
   }
 
