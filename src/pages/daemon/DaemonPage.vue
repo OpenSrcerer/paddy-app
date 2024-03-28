@@ -1,17 +1,25 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    <div id="container" >
-      <h4>Daemon {{ daemonId }}</h4>
-      <h5>Status: {{ daemonLastPing }}</h5>
-      <h5>Active: {{ daemonStateFormatted }}</h5>
+  <q-page class="column items-center justify-evenly">
+    <div id="chart"></div>
 
-      <div id="buttons">
+    <div id="container">
+      <div class="vertical">
+        <h4>Daemon {{ daemonId }}</h4>
+        <h5>Status: {{ daemonLastPing }}</h5>
+        <h5>Active: {{ daemonStateFormatted }}</h5>
+      </div>
+
+      <br><br>
+
+      <div class="horizontal">
         <button @click="toggleDaemon">Toggle</button>
         <br><br>
         <button @click="resetDaemon">Reset</button>
         <br><br>
         <button @click="deleteDaemon">Delete</button>
       </div>
+
+      <br><br>
     </div>
   </q-page>
 </template>
@@ -22,6 +30,8 @@ import daemon from 'src/backend/daemon/DaemonPaddyBackendClient';
 import { useRoute, useRouter } from 'vue-router';
 import { init, reset } from 'src/bluetooth/BleService';
 import moment from 'moment';
+import ApexCharts from 'apexcharts';
+import power from 'src/backend/power/PowerPaddyBackendClient';
 
 const route = useRoute();
 const router = useRouter()
@@ -30,7 +40,12 @@ const daemonId = ref(route.params.id)
 const daemonLastPing = ref('...')
 const daemonState = ref<boolean | undefined>(undefined)
 
-onBeforeMount(async () => updateDaemonData())
+onBeforeMount(async () => {
+  await Promise.all([
+    updateDaemonData(),
+    loadChartData()
+  ])
+})
 
 const daemonStateFormatted = computed(() => {
   if (daemonState.value === undefined) { return '...' }
@@ -55,7 +70,6 @@ const deleteDaemon = async () => {
 }
 
 const updateDaemonData = async () => {
-  console.log("1", daemonState.value)
   const res = await daemon.getDaemon(daemonId.value as string)
   if (!res) { return; }
 
@@ -66,15 +80,52 @@ const updateDaemonData = async () => {
 
   daemonLastPing.value = `Last ping ${moment(res.lastPing * 1000).fromNow()}`
 }
+
+const loadChartData = async () => {
+  const powers = await power.getAllDaemonPowers(daemonId.value as string)
+
+  const options = {
+    chart: { type: 'line' },
+    series: [{
+      name: 'Power Draw (W)',
+      data: powers.map(p => p.w)
+    }],
+    xaxis: {
+      categories: powers.map(p => new Date(p.timestamp * 1000)
+        .toLocaleTimeString('en-US', { hour12: false }))
+    }
+  }
+
+  const chart = new ApexCharts(document.querySelector("#chart"), options);
+  await chart.render();
+}
+
 </script>
 
 <style scoped lang="scss">
-#container {
-  text-align: center;
+#chart {
+  min-width: 30%;
 }
 
-#buttons {
+h4, h5 {
+  margin: 0;
+}
+
+#container {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.vertical {
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column;
+}
+
+.horizontal {
   display: flex;
   gap: 1.5rem;
+  justify-content: space-around;
 }
 </style>
