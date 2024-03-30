@@ -1,12 +1,13 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    <div id="container">
-      <h3>Welcome!</h3>
+  <q-page class="column items-center justify-center">
+    <h4>Welcome to the Paddy App!</h4>
+    <h6>Log in or sign up to get started!</h6>
 
-      <div>
-        <q-btn to="login">Login</q-btn>
-        <q-btn to="signup">Sign Up</q-btn>
-      </div>
+    <q-img src="~assets/webp/clyde_fly.webp"></q-img>
+
+    <div id="container">
+      <q-btn to="login">Login</q-btn>
+      <q-btn to="signup">Sign Up</q-btn>
     </div>
   </q-page>
 </template>
@@ -16,9 +17,33 @@
 </script>
 
 <style scoped lang="scss">
+h4, h6 {
+  text-align: center;
+  margin: 0 1rem 0 1rem;
+}
+
+h4 {
+  margin-bottom: 5px;
+}
+
+.q-img {
+  min-width: 10rem;
+  max-width: 15rem;
+}
+
+.q-btn {
+  color: ghostwhite;
+  border: ghostwhite 1px solid;
+}
+
 #container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#container * {
+  min-width: 6rem;
 }
 </style>

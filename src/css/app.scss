@@ -1,1 +1,22 @@
 // app global css in SCSS form
+body {
+  background-color: $dark;
+}
+
+h1, h2, h3, h4, h5, h6, p, button,
+.q-item__label, .q-icon, .q-toolbar .q-btn
+{
+  color: ghostwhite;
+}
+
+// ---- Fonts ----
+@font-face {
+  font-family: "Fira Sans";
+  src: local("Cheri"),
+  url("./fonts/Firava.woff2");
+}
+
+h1, h2, h3, h4, h5, h6, p, button,
+.q-item__label, .q-btn, .q-toolbar div {
+  font-family: "Fira Sans", serif;
+}

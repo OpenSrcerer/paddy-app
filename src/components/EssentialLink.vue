@@ -32,3 +32,6 @@ withDefaults(defineProps<EssentialLinkProps>(), {
   icon: '',
 });
 </script>
+
+<style scoped lang="scss">
+</style>

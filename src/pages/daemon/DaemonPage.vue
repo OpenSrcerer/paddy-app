@@ -1,8 +1,12 @@
 <template>
-  <q-page class="column items-center justify-evenly">
-    <div id="chart"></div>
 
-    <div id="container">
+  <q-page class="grid-container">
+
+    <div class="horizontal">
+      <div id="power-chart"></div>
+    </div>
+
+    <div class="column items-center justify-center">
       <div class="vertical">
         <h4>Daemon {{ daemonId }}</h4>
         <h5>Status: {{ daemonLastPing }}</h5>
@@ -12,11 +16,9 @@
       <br><br>
 
       <div class="horizontal">
-        <button @click="toggleDaemon">Toggle</button>
-        <br><br>
-        <button @click="resetDaemon">Reset</button>
-        <br><br>
-        <button @click="deleteDaemon">Delete</button>
+        <q-btn @click="toggleDaemon">Toggle</q-btn>
+        <q-btn @click="resetDaemon">Reset</q-btn>
+        <q-btn @click="deleteDaemon">Delete</q-btn>
       </div>
 
       <br><br>
@@ -25,13 +27,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeMount, ref } from 'vue';
+import { computed, onBeforeMount, onMounted, onUnmounted, ref } from 'vue';
 import daemon from 'src/backend/daemon/DaemonPaddyBackendClient';
 import { useRoute, useRouter } from 'vue-router';
 import { init, reset } from 'src/bluetooth/BleService';
 import moment from 'moment';
 import ApexCharts from 'apexcharts';
 import power from 'src/backend/power/PowerPaddyBackendClient';
+import * as apexcharts from 'apexcharts';
 
 const route = useRoute();
 const router = useRouter()
@@ -40,12 +43,16 @@ const daemonId = ref(route.params.id)
 const daemonLastPing = ref('...')
 const daemonState = ref<boolean | undefined>(undefined)
 
-onBeforeMount(async () => {
-  await Promise.all([
-    updateDaemonData(),
-    loadChartData()
-  ])
-})
+const chart = ref<ApexCharts>()
+const timerId = setInterval(async () => await loadChartData(), 10000);
+
+onBeforeMount(async () => await updateDaemonData())
+
+onMounted(async () => await makeChart())
+
+onUnmounted(() => {
+  clearInterval(timerId);
+});
 
 const daemonStateFormatted = computed(() => {
   if (daemonState.value === undefined) { return '...' }
@@ -81,40 +88,93 @@ const updateDaemonData = async () => {
   daemonLastPing.value = `Last ping ${moment(res.lastPing * 1000).fromNow()}`
 }
 
-const loadChartData = async () => {
-  const powers = await power.getAllDaemonPowers(daemonId.value as string)
-
+const makeChart = async () => {
   const options = {
-    chart: { type: 'line' },
+    chart: {
+      type: 'line',
+      toolbar: { show: false },
+      height: '90%'
+    },
+    title: {
+      text: 'Power Draw'
+    },
+    stroke: {
+      curve: 'smooth'
+    },
+    grid: {
+      borderColor: 'rgba(255,255,255,0.3)', // Color of the grid lines
+      strokeDashArray: 4, // Stroke dash array for dashed lines
+      yaxis: {
+        lines: {
+          show: true // Show horizontal grid lines
+        }
+      }
+    },
+    // dataLabels: {
+    //   enabled: true,
+    //   style: {
+    //     colors: ['#ff0000'] // Red color
+    //   }
+    // },
+    series: [],
+    xaxis: {},
+    noData: { text: 'Loading...' },
+  }
+
+  const newChart = new ApexCharts(document.querySelector("#power-chart"), options);
+  await newChart.render();
+  chart.value = newChart;
+
+  await loadChartData()
+}
+
+const loadChartData = async () => {
+  const powers = await power.getAllDaemonPowers(daemonId.value as string, { limit: 10 })
+  await chart.value?.updateOptions({
     series: [{
       name: 'Power Draw (W)',
-      data: powers.map(p => p.w)
+      data: powers.map(p => p.w),
+      color: '#b262cf'
     }],
     xaxis: {
       categories: powers.map(p => new Date(p.timestamp * 1000)
-        .toLocaleTimeString('en-US', { hour12: false }))
+        .toLocaleTimeString('en-US', { hour12: false })),
+      labels: {
+        style: {
+          colors: powers.map(_ => 'ghostwhite') // Red color
+        }
+      }
+    },
+    yaxis: {
+      labels: {
+        maxTicks: 5,
+        style: {
+          colors: powers.map(_ => 'ghostwhite') // Red color
+        }
+      }
     }
-  }
-
-  const chart = new ApexCharts(document.querySelector("#chart"), options);
-  await chart.render();
+  })
 }
-
 </script>
 
 <style scoped lang="scss">
-#chart {
-  min-width: 30%;
+#power-chart {
+  min-width: 80%;
 }
 
 h4, h5 {
   margin: 0;
 }
 
-#container {
+.grid-container {
+  display: grid;
+  width: 100%;
+}
+
+.grid-container > div:nth-of-type(2) {
+  width: 100%;
+  border-top: ghostwhite 1px solid;
   text-align: center;
-  display: flex;
-  flex-direction: column;
 }
 
 .vertical {
@@ -123,9 +183,17 @@ h4, h5 {
   flex-direction: column;
 }
 
+.q-btn {
+  min-width: 5rem;
+  color: ghostwhite;
+  border: ghostwhite 1px solid;
+}
+
 .horizontal {
   display: flex;
   gap: 1.5rem;
-  justify-content: space-around;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
 }
 </style>

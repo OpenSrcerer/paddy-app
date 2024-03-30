@@ -8,14 +8,16 @@ class PowerPaddyBackendClient extends AbstractBackendClient {
 
   async getAllDaemonPowers(
     daemonId: string,
-    before?: number,
-    after?: number,
-    limit?: number,
+    opt: {
+      before?: number,
+      after?: number,
+      limit?: number
+    }
   ): Promise<Array<Power>> {
     const queryParams = Object.assign({},
-      !before ? null : { before: `${before}` },
-      !after ? null : { after: `${after}` },
-      !limit ? null : { limit: `${limit}` });
+      !opt.before ? null : { before: `${opt.before}` },
+      !opt.after ? null : { after: `${opt.after}` },
+      !opt.limit ? null : { limit: `${opt.limit}` });
 
     const res = await this.request<Array<Power>>(
       "GET", PowerRoute.GET_ALL_POWERS, { daemonId }, queryParams)
