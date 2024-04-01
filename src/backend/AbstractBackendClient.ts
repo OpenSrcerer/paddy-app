@@ -4,6 +4,7 @@ import { SessionRoute } from 'src/backend/session/SessionRoute.enum';
 import { LoginResponseDto } from 'src/backend/session/dto/LoginResponseDto';
 import { PaddyRes } from 'src/backend/PaddyRes';
 import { pbkdf2 } from 'src/backend/WebCryptoPbkdf2';
+import router, { Router } from 'src/router';
 
 export abstract class AbstractBackendClient {
 
@@ -87,6 +88,7 @@ export abstract class AbstractBackendClient {
   // Get a new JWT if the user credentials are set
   private async login() {
     if (!AbstractBackendClient.emailOrUsername || !AbstractBackendClient.passwordHash) {
+      await Router.replace("/")
       throw new Error("Credentials missing... cannot retrieve jwt!")
     }
 

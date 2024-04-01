@@ -10,9 +10,9 @@
     <div v-else-if="!store.wpaType" class="container">
       <h5>Wifi Security Type:</h5>
 
-      <button type="button" @click="store.wpaType = 'PERSONAL'">Personal</button>
+      <button type="button" @click="store.wpaType = 'P'">Personal</button>
       <br><br>
-      <button type="button" @click="store.wpaType = 'ENTERPRISE'">Enterprise</button>
+      <button type="button" @click="store.wpaType = 'E'">Enterprise</button>
     </div>
 
     <div v-else-if="!store.ssid" class="container">

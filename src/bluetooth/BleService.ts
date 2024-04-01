@@ -93,7 +93,14 @@ async function writeToChar(deviceId: string, char: string | undefined, value: st
 }
 
 async function connectDaemon(): Promise<BleDevice> {
-  await BleClient.initialize();
+  try {
+    await BleClient.initialize();
+  } catch (e) {
+    throw new Error(
+      "Sorry, but your device does not support Bluetooth Low Energy.\n" +
+      "Please retry on a device with support."
+    )
+  }
 
   console.log('[BleService] Requesting BLE device with capabilities...');
   const device = await BleClient.requestDevice({

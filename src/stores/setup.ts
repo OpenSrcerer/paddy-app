@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { BleOptions, DaemonDevice } from 'src/bluetooth/BleOptions';
 
 type SetupStoreMetadata = {
-  wpaType: 'PERSONAL' | 'ENTERPRISE'
+  wpaType: 'P' | 'E'
 }
 
 export type SetupStore = Partial<DaemonDevice> & Partial<SetupStoreMetadata> & BleOptions
@@ -26,7 +26,16 @@ export const useSetupStore = defineStore('setup', {
 
   getters: {
     isWifiEnterprise(): boolean {
-      return this.wpaType === 'ENTERPRISE'
+      return this.wpaType == 'E'
+    },
+
+
+    isComplete(): boolean {
+      const daemonComplete = !!this.daemon && !!this.id && !!this.wpaType
+      const personalComplete = !!this.ssid && !!this.pass
+      const enterpriseComplete = !!this.ssid && !!this.ePassword && !!this.eUsername
+
+      return daemonComplete && (personalComplete || enterpriseComplete);
     },
 
     getOptions(state): BleOptions {

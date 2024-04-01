@@ -55,7 +55,7 @@ const essentialLinks: EssentialLinkProps[] = [
     caption: 'danielstefani.online',
     icon: 'school',
     link: 'https://danielstefani.online'
-  }
+  },
 ];
 
 const leftDrawerOpen = ref(false)

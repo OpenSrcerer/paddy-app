@@ -1,12 +1,29 @@
-// app global css in SCSS form
 body {
   background-color: $dark;
 }
 
+* {
+  user-select: none;
+}
+
 h1, h2, h3, h4, h5, h6, p, button,
-.q-item__label, .q-icon, .q-toolbar .q-btn
+.q-item__label, .q-icon, .q-toolbar .q-btn,
+.q-card__section
 {
   color: ghostwhite;
+}
+
+.q-card {
+  background-color: $dark;
+  border: ghostwhite 1px solid;
+}
+
+// Fix q-toggle & q-radio backgrounds color
+.q-toggle__inner--falsy > .q-toggle__track {
+  background-color: gray;
+}
+.q-radio__inner--falsy {
+  color: gray;
 }
 
 // ---- Fonts ----
@@ -16,7 +33,23 @@ h1, h2, h3, h4, h5, h6, p, button,
   url("./fonts/Firava.woff2");
 }
 
-h1, h2, h3, h4, h5, h6, p, button,
-.q-item__label, .q-btn, .q-toolbar div {
+h1, h2, h3, h4, h5, h6, p, button, index-page, span,
+.q-item__label, .q-btn, .q-toolbar div, .q-card__section {
   font-family: "Fira Sans", serif;
+}
+
+// ---- Custom Components ----
+.input-form {
+  font-size: 1.4rem;
+  height: 2em;
+  width: 60%;
+  background-color: $dark;
+  color: ghostwhite;
+  text-align: center;
+  margin-top: 0.5em;
+  margin-bottom: 1rem;
+  border: ghostwhite 1px solid;
+  border-radius: .5em;
+  max-height: 2em;
+  transition: all .25s ease-in-out
 }

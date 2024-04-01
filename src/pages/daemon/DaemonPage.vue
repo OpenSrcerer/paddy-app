@@ -1,22 +1,19 @@
 <template>
-
-  <q-page class="grid-container">
-
+  <q-page v-if="!!daemonRef" class="grid-container">
     <div class="horizontal">
       <div id="power-chart"></div>
     </div>
 
     <div class="column items-center justify-center">
-      <div class="vertical">
-        <h4>Daemon {{ daemonId }}</h4>
-        <h5>Status: {{ daemonLastPing }}</h5>
-        <h5>Active: {{ daemonStateFormatted }}</h5>
-      </div>
-
-      <br><br>
+      <DaemonComponent :daemon="daemonRef"/>
 
       <div class="horizontal">
-        <q-btn @click="toggleDaemon">Toggle</q-btn>
+        <q-toggle
+          :model-value="daemonRef.on"
+          icon="bolt"
+          size="5rem"
+          @click="toggleDaemon"
+        />
         <q-btn @click="resetDaemon">Reset</q-btn>
         <q-btn @click="deleteDaemon">Delete</q-btn>
       </div>
@@ -24,6 +21,8 @@
       <br><br>
     </div>
   </q-page>
+
+  <div class="column items-center justify-center" v-else><LoadingSpinner/></div>
 </template>
 
 <script setup lang="ts">
@@ -35,31 +34,29 @@ import moment from 'moment';
 import ApexCharts from 'apexcharts';
 import power from 'src/backend/power/PowerPaddyBackendClient';
 import * as apexcharts from 'apexcharts';
+import { Daemon, getBadgeColor, getDaemonStatus } from 'src/backend/daemon/dto/Daemon';
+import DaemonComponent from 'components/DaemonComponent.vue';
+import LoadingSpinner from 'components/LoadingSpinner.vue';
 
 const route = useRoute();
 const router = useRouter()
 
 const daemonId = ref(route.params.id)
-const daemonLastPing = ref('...')
-const daemonState = ref<boolean | undefined>(undefined)
+const daemonRef = ref<Daemon | undefined>({
+  id: daemonId.value as string,
+  on: false,
+  lastPing: 0
+})
 
 const chart = ref<ApexCharts>()
-const timerId = setInterval(async () => await loadChartData(), 10000);
+const pollIntervalId = setInterval(
+  async () => await Promise.all([loadChartData(), updateDaemonData()]),
+  10000
+);
 
 onBeforeMount(async () => await updateDaemonData())
-
 onMounted(async () => await makeChart())
-
-onUnmounted(() => {
-  clearInterval(timerId);
-});
-
-const daemonStateFormatted = computed(() => {
-  if (daemonState.value === undefined) { return '...' }
-  if (daemonState.value === true) { return 'Yes' }
-  if (daemonState.value === false) { return 'No' }
-  return 'Unknown'
-})
+onUnmounted(() => { clearInterval(pollIntervalId); });
 
 const toggleDaemon = async () => {
   await daemon.toggle(daemonId.value as string)
@@ -80,12 +77,7 @@ const updateDaemonData = async () => {
   const res = await daemon.getDaemon(daemonId.value as string)
   if (!res) { return; }
 
-  daemonState.value = res.on
-
-  if (!res?.lastPing) { daemonLastPing.value = 'Unknown'; return }
-  if ((Date.now() / 1000) - res.lastPing < 60) { daemonLastPing.value = 'Online'; return }
-
-  daemonLastPing.value = `Last ping ${moment(res.lastPing * 1000).fromNow()}`
+  daemonRef.value = res;
 }
 
 const makeChart = async () => {
@@ -134,14 +126,14 @@ const loadChartData = async () => {
     series: [{
       name: 'Power Draw (W)',
       data: powers.map(p => p.w),
-      color: '#b262cf'
+      color: '#aa0aaa'
     }],
     xaxis: {
       categories: powers.map(p => new Date(p.timestamp * 1000)
         .toLocaleTimeString('en-US', { hour12: false })),
       labels: {
         style: {
-          colors: powers.map(_ => 'ghostwhite') // Red color
+          colors: powers.map(_ => 'ghostwhite')
         }
       }
     },
@@ -149,7 +141,7 @@ const loadChartData = async () => {
       labels: {
         maxTicks: 5,
         style: {
-          colors: powers.map(_ => 'ghostwhite') // Red color
+          colors: powers.map(_ => 'ghostwhite')
         }
       }
     }
