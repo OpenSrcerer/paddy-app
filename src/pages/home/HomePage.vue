@@ -1,96 +1,100 @@
 <template>
-  <div id="container">
 
-    <LoadingSpinner v-if="!daemons"/>
+  <MainLayout>
+    <div id="container">
 
-    <q-scroll-area v-else-if="!!(daemons as Array<Daemon>).length" class="column" id="scroll-container">
-      <div class="daemon-container wrap"
-           v-for="daemon in daemons" :key="daemon.id"
-           @click="onDaemonClick(daemon.id)"
-      >
-        <DaemonComponent :daemon="daemon"/>
+      <LoadingSpinner v-if="!daemons"/>
 
-        <q-toggle
-          :model-value="daemon.on"
-          icon="bolt"
-          size="5rem"
-          @click="toggleDaemon(daemon.id)"
-        />
+      <q-scroll-area v-else-if="!!(daemons as Array<Daemon>).length" class="column" id="scroll-container">
+        <div class="daemon-container wrap"
+             v-for="daemon in daemons" :key="daemon.id"
+             @click="onDaemonClick(daemon.id)"
+        >
+          <DaemonComponent :dense="false" :daemon="daemon"/>
+
+          <q-toggle
+            :model-value="daemon.on"
+            icon="bolt"
+            size="5rem"
+            @click="toggleDaemon(daemon.id)"
+          />
+        </div>
+      </q-scroll-area>
+
+      <div v-else style="height: 100%" class="column items-center">
+        <h4>No daemons here.</h4>
+        <p>Why don't you get some?</p>
       </div>
-    </q-scroll-area>
-
-    <div v-else style="height: 100%" class="column items-center">
-      <h4>No daemons here.</h4>
-      <p>Why don't you get some?</p>
-    </div>
-  </div>
-
-  <q-icon id="add-daemon-btn" name="add" @click="onAddNewBtnClick"/>
-
-  <DialogComponent
-    v-model="alert"
-
-    :icon="alertIcon"
-    :persistent="alertPersistent"
-    :title="alertTitle"
-    :close-button="alertCloseButton"
-    :buttons="alertEventButtons"
-
-    @next="alertOnNext"
-    @finish="alertOnNext"
-  >
-    <div v-if="setupFinish" class="column items-center">
-      <p><b>Your Daemon has been successfully configured! Enjoy.</b></p>
-      <q-img src="~assets/webp/clyde_fly.webp"></q-img>
-      <p>Please allow a couple of minutes for the Daemon to calibrate itself and connect to your Wi-Fi network.</p>
     </div>
 
-    <p v-else-if="(!store.daemon || !store.id) && !alertErrorText">
-      Hey, are you ready to setup your new Daemon?
-      <br>
-      Just press "Next" to get started!
-    </p>
+    <q-icon id="add-daemon-btn" name="add" @click="onAddNewBtnClick"/>
 
-    <div v-else-if="!store.wpaType && !alertErrorText">
-      <p>
-        <b>If you don't know which one to choose, choose "Personal".</b>
+    <DialogComponent
+      v-model="alert"
+
+      :icon="alertIcon"
+      :persistent="alertPersistent"
+      :title="alertTitle"
+      :close-button="alertCloseButton"
+      :buttons="alertEventButtons"
+
+      @next="alertOnNext"
+      @finish="alertOnNext"
+    >
+      <div v-if="setupFinish" class="column items-center">
+        <p><b>Your Daemon has been successfully configured! Enjoy.</b></p>
+        <q-img src="~assets/webp/clyde_fly.webp"></q-img>
+        <p>Please allow a couple of minutes for the Daemon to calibrate itself and connect to your Wi-Fi network.</p>
+      </div>
+
+      <p v-else-if="(!store.daemon || !store.id) && !alertErrorText">
+        Hey, are you ready to setup your new Daemon?
         <br>
-        Enterprise access points are often common in places like offices or schools, and require a username and a password.
+        Just press "Next" to get started!
       </p>
-      <div class="row justify-center">
-        <q-option-group
-          v-model="setupWifiType"
-          :options="[{ label: 'Personal', value: 'P' }, { label: 'Enterprise', value: 'E' }]"
-          color="primary"
-          inline
-        />
+
+      <div v-else-if="!store.wpaType && !alertErrorText">
+        <p>
+          <b>If you don't know which one to choose, choose "Personal".</b>
+          <br>
+          Enterprise access points are often common in places like offices or schools, and require a username and a password.
+        </p>
+        <div class="row justify-center">
+          <q-option-group
+            v-model="setupWifiType"
+            :options="[{ label: 'Personal', value: 'P' }, { label: 'Enterprise', value: 'E' }]"
+            color="primary"
+            inline
+          />
+        </div>
       </div>
-    </div>
 
-    <div class="column justify-center items-center" v-else-if="!store.ssid && !alertErrorText">
-      <label>Wifi SSID:</label>
-      <input class="input-form" type="text" v-model="setupSsid">
+      <div class="column justify-center items-center" v-else-if="!store.ssid && !alertErrorText">
+        <label>Wifi SSID:</label>
+        <input class="input-form" type="text" v-model="setupSsid">
 
-      <label v-if="!store.isWifiEnterprise">Wifi Password:</label>
-      <input class="input-form" v-if="!store.isWifiEnterprise" type="password" v-model="setupPass">
+        <label v-if="!store.isWifiEnterprise">Wifi Password:</label>
+        <input class="input-form" v-if="!store.isWifiEnterprise" type="password" v-model="setupPass">
 
-      <label v-if="store.isWifiEnterprise">Enterprise Username:</label>
-      <input class="input-form" v-if="store.isWifiEnterprise" v-model="setupEUsername">
+        <label v-if="store.isWifiEnterprise">Enterprise Username:</label>
+        <input class="input-form" v-if="store.isWifiEnterprise" v-model="setupEUsername">
 
-      <label v-if="store.isWifiEnterprise">Enterprise Password:</label>
-      <input class="input-form" v-if="store.isWifiEnterprise" type="password" v-model="setupEPassword">
-    </div>
+        <label v-if="store.isWifiEnterprise">Enterprise Password:</label>
+        <input class="input-form" v-if="store.isWifiEnterprise" type="password" v-model="setupEPassword">
+      </div>
 
-    <div v-else-if="store.isComplete && !alertErrorText">
-      <p>
-        <b>You are almost ready to set up your new Daemon.</b>
-        <br><br>
-        Once you click "Finish", your daemon will be automatically configured.
-      </p>
-    </div>
+      <div v-else-if="store.isComplete && !alertErrorText">
+        <p>
+          <b>You are almost ready to set up your new Daemon.</b>
+          <br><br>
+          Once you click "Finish", your daemon will be automatically configured.
+        </p>
+      </div>
 
-    <p v-if="!!alertErrorText">{{ alertErrorText }}</p>
-  </DialogComponent>
+      <p v-if="!!alertErrorText">{{ alertErrorText }}</p>
+    </DialogComponent>
+  </MainLayout>
+
 </template>
 
 <script setup lang="ts">
@@ -104,6 +108,7 @@ import { SetupStore, useSetupStore } from 'stores/setup';
 import { config, disconnect, init } from 'src/bluetooth/BleService';
 import { DaemonDevice } from 'src/bluetooth/BleOptions';
 import LoadingSpinner from 'components/LoadingSpinner.vue';
+import MainLayout from 'layouts/MainLayout.vue';
 
 const router = useRouter()
 const store = useSetupStore()
@@ -276,10 +281,6 @@ const onConfigDaemon = async () => {
 <style scoped lang="scss">
 body {
   overflow-y: hidden;
-}
-
-h4 {
-  margin: 1rem;
 }
 
 .q-img {

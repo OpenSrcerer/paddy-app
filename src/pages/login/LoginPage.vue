@@ -1,33 +1,37 @@
 <template>
-  <div style="height: 100vh" class="row items-center justify-evenly">
-    <div
-      id="container"
-      @keydown.enter.prevent="onLogin"
-    >
-      <div>
-        <h5>Email or Username:</h5>
-        <input class="input-form" type="text" v-model="emailOrUsernameForm">
-      </div>
 
-      <div>
-        <h5>Password:</h5>
-        <input class="input-form" type="password" v-model="passwordForm">
-      </div>
+  <MainLayout>
+    <div style="height: 100vh" class="row items-center justify-evenly">
+      <div
+        id="container"
+        @keydown.enter.prevent="onLogin"
+      >
+        <div>
+          <h5>Email or Username:</h5>
+          <input class="input-form" type="text" v-model="emailOrUsernameForm">
+        </div>
 
-      <q-btn push @click="onLogin">Login</q-btn>
+        <div>
+          <h5>Password:</h5>
+          <input class="input-form" type="password" v-model="passwordForm">
+        </div>
+
+        <q-btn push @click="onLogin">Login</q-btn>
+      </div>
     </div>
-  </div>
 
-  <DialogComponent
-    v-model="alert"
-    title="Warning"
-    icon="report_problem"
-    close-button="OK"
-  >
-    <q-card-section class="q-pt-none">
-      {{ alertText }}
-    </q-card-section>
-  </DialogComponent>
+    <DialogComponent
+      v-model="alert"
+      title="Warning"
+      icon="report_problem"
+      close-button="OK"
+    >
+      <q-card-section class="q-pt-none">
+        {{ alertText }}
+      </q-card-section>
+    </DialogComponent>
+  </MainLayout>
+
 </template>
 
 <script setup lang="ts">
@@ -35,6 +39,7 @@ import { ref } from 'vue';
 import session from 'src/backend/session/SessionPaddyBackendClient';
 import { useRouter } from 'vue-router';
 import DialogComponent from 'components/DialogComponent.vue';
+import MainLayout from 'layouts/MainLayout.vue';
 
 const router = useRouter()
 

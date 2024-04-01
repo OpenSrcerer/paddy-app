@@ -1,28 +1,39 @@
 <template>
-  <q-page v-if="!!daemonRef" class="grid-container">
-    <div class="horizontal">
-      <div id="power-chart"></div>
-    </div>
 
-    <div class="column items-center justify-center">
-      <DaemonComponent :daemon="daemonRef"/>
+  <MainLayout>
+    <template #toolbar>
+      <DaemonComponent :dense="true" :daemon="daemonRef"/>
+      <q-toggle
+        :model-value="daemonRef.on"
+        icon="bolt"
+        size="3rem"
+        @click="toggleDaemon"
+      />
+    </template>
 
-      <div class="horizontal">
-        <q-toggle
-          :model-value="daemonRef.on"
-          icon="bolt"
-          size="5rem"
-          @click="toggleDaemon"
-        />
-        <q-btn @click="resetDaemon">Reset</q-btn>
-        <q-btn @click="deleteDaemon">Delete</q-btn>
+    <q-page v-if="!!daemonRef" class="grid-container">
+
+      <div class="d-items-container">
+        <div>
+          <div class="horizontal">
+            <q-btn @click="resetDaemon">Reset</q-btn>
+            <q-btn @click="deleteDaemon">Delete</q-btn>
+          </div>
+        </div>
+
+        <div id="schedules">
+          <h5 v-for="schedule in daemonSchedules" :key="schedule.id">{{ schedule.periodic }}</h5>
+        </div>
       </div>
 
-      <br><br>
-    </div>
-  </q-page>
+      <div class="horizontal">
+        <div id="power-chart"></div>
+      </div>
+    </q-page>
 
-  <div class="column items-center justify-center" v-else><LoadingSpinner/></div>
+    <div class="column items-center justify-center" v-else><LoadingSpinner/></div>
+  </MainLayout>
+
 </template>
 
 <script setup lang="ts">
@@ -37,6 +48,9 @@ import * as apexcharts from 'apexcharts';
 import { Daemon, getBadgeColor, getDaemonStatus } from 'src/backend/daemon/dto/Daemon';
 import DaemonComponent from 'components/DaemonComponent.vue';
 import LoadingSpinner from 'components/LoadingSpinner.vue';
+import { Schedule } from 'src/backend/schedule/dto/Schedule';
+import schedule from 'src/backend/schedule/SchedulePaddyBackendClient';
+import MainLayout from 'layouts/MainLayout.vue';
 
 const route = useRoute();
 const router = useRouter()
@@ -47,6 +61,7 @@ const daemonRef = ref<Daemon | undefined>({
   on: false,
   lastPing: 0
 })
+const daemonSchedules = ref<Array<Schedule>>([])
 
 const chart = ref<ApexCharts>()
 const pollIntervalId = setInterval(
@@ -74,10 +89,12 @@ const deleteDaemon = async () => {
 }
 
 const updateDaemonData = async () => {
-  const res = await daemon.getDaemon(daemonId.value as string)
-  if (!res) { return; }
+  const dRes = await daemon.getDaemon(daemonId.value as string)
+  if (!dRes) { return; }
+  const sRes = (await schedule.getAllSchedules(daemonId.value as string)) ?? []
 
-  daemonRef.value = res;
+  daemonRef.value = dRes;
+  daemonSchedules.value = sRes;
 }
 
 const makeChart = async () => {
@@ -149,13 +166,35 @@ const loadChartData = async () => {
 }
 </script>
 
+<style lang="scss">
+body {
+  overflow-y: visible;
+}
+</style>
+
 <style scoped lang="scss">
+h4, h5 {
+  margin: 0;
+}
+
 #power-chart {
   min-width: 80%;
 }
 
-h4, h5 {
-  margin: 0;
+#schedules {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.d-items-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.d-items-container > * {
+  flex: 1 1 auto;
 }
 
 .grid-container {
@@ -187,5 +226,10 @@ h4, h5 {
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
+  padding: 0 1rem 0 1rem;
+}
+
+.name-chip-wrapper {
+  flex-wrap: nowrap !important;
 }
 </style>

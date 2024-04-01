@@ -11,11 +11,12 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title>
-          Paddy App
+        <q-toolbar-title class="toolbar-content-wrapper">
+          <slot name="toolbar">
+            <h5>Paddy App</h5>
+            <div id="made-with-love">Made with ❤️</div>
+          </slot>
         </q-toolbar-title>
-
-        <div>Made with ❤️</div>
       </q-toolbar>
     </q-header>
 
@@ -32,15 +33,15 @@
         </q-item-label>
 
         <EssentialLink
-          v-for="link in essentialLinks"
+          v-for="link in links"
           :key="link.title"
           v-bind="link"
         />
       </q-list>
     </q-drawer>
 
-    <q-page-container>
-      <router-view />
+    <q-page-container style="height: 100vh">
+      <slot/>
     </q-page-container>
   </q-layout>
 </template>
@@ -49,28 +50,52 @@
 import { ref } from 'vue';
 import EssentialLink, { EssentialLinkProps } from 'components/EssentialLink.vue';
 
-const essentialLinks: EssentialLinkProps[] = [
-  {
-    title: 'My Blog',
-    caption: 'danielstefani.online',
-    icon: 'school',
-    link: 'https://danielstefani.online'
-  },
-];
+export interface MainLayoutProps {
+  links?: EssentialLinkProps[]
+}
+const props = withDefaults(defineProps<MainLayoutProps>(), {
+  links: () => [
+    {
+      title: 'My Blog',
+      caption: 'danielstefani.online',
+      icon: 'school',
+      link: 'https://danielstefani.online'
+    }
+  ]
+})
 
 const leftDrawerOpen = ref(false)
 
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value
-}
+const toggleLeftDrawer = () => leftDrawerOpen.value = !leftDrawerOpen.value
 </script>
 
 <style lang="scss">
+@media (max-width: 462px) {
+  #made-with-love {
+    display: none;
+  }
+}
+
+.toolbar-content-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 50px;
+}
+
 .q-header {
   border-bottom: 1px solid rgb(255, 255, 255)
 }
 
 .q-drawer__content, .q-layout__section--marginal {
   background-color: $dark;
+}
+</style>
+
+<style scoped lang="scss">
+
+
+.q-toolbar__title h5 {
+  margin: 0;
 }
 </style>
