@@ -287,6 +287,7 @@ h4 {
 }
 
 #scroll-container {
+  margin-top: 2rem;
   height: 100vh;
   width: 50%;
   gap: 10px;
