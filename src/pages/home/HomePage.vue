@@ -287,10 +287,15 @@ body {
   width: 75%;
 }
 
+.daemon-container {
+  max-width: 50%;
+  margin: 0 auto;
+}
+
 #scroll-container {
-  margin-top: 2rem;
+  padding-top: 2rem;
   height: 100vh;
-  width: 50%;
+  width: 100%;
   gap: 10px;
 }
 

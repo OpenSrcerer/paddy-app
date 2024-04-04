@@ -60,6 +60,12 @@ const props = withDefaults(defineProps<MainLayoutProps>(), {
       caption: 'danielstefani.online',
       icon: 'school',
       link: 'https://danielstefani.online'
+    },
+    {
+      title: 'Route Test',
+      caption: 'aha astaras',
+      icon: 'school',
+      route: '/daemon/4'
     }
   ]
 })
@@ -70,7 +76,7 @@ const toggleLeftDrawer = () => leftDrawerOpen.value = !leftDrawerOpen.value
 </script>
 
 <style lang="scss">
-@media (max-width: 462px) {
+@media (max-width: 350px) {
   #made-with-love {
     display: none;
   }

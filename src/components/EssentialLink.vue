@@ -1,9 +1,10 @@
 <template>
   <q-item
     clickable
-    tag="a"
-    target="_blank"
-    :href="link"
+    :tag="!!route ? null : 'a'"
+    :target="!!route ? null : '_blank'"
+    :href="!!route ? null : link"
+    @click.prevent="onRouteLink"
   >
     <q-item-section
       v-if="icon"
@@ -20,17 +21,28 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
+
 export interface EssentialLinkProps {
   title: string;
   caption?: string;
   link?: string;
+  route?: string;
   icon?: string;
 }
-withDefaults(defineProps<EssentialLinkProps>(), {
+const props = withDefaults(defineProps<EssentialLinkProps>(), {
   caption: '',
   link: '#',
   icon: '',
 });
+
+const onRouteLink = async () => {
+  if (!props.route) return;
+
+  await router.replace(props.route)
+}
 </script>
 
 <style scoped lang="scss">

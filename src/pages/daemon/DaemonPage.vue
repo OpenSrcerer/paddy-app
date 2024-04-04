@@ -11,27 +11,20 @@
       />
     </template>
 
-    <q-page v-if="!!daemonRef" class="grid-container">
+    <div v-if="!!daemonRef">
+      <OverView
+        v-if="routeView == 'OVER'"
 
-      <div class="d-items-container">
-        <div>
-          <div class="horizontal">
-            <q-btn @click="resetDaemon">Reset</q-btn>
-            <q-btn @click="deleteDaemon">Delete</q-btn>
-          </div>
-        </div>
+        :powers="daemonPowers"
+      />
+      <ScheduleView v-else-if="routeView == 'SCHD'"/>
+      <StatisticsView v-else-if="routeView == 'STAT'"/>
+    </div>
 
-        <div id="schedules">
-          <h5 v-for="schedule in daemonSchedules" :key="schedule.id">{{ schedule.periodic }}</h5>
-        </div>
-      </div>
+    <div v-else class="column items-center justify-center">
+      <LoadingSpinner/>
+    </div>
 
-      <div class="horizontal">
-        <div id="power-chart"></div>
-      </div>
-    </q-page>
-
-    <div class="column items-center justify-center" v-else><LoadingSpinner/></div>
   </MainLayout>
 
 </template>
@@ -51,6 +44,10 @@ import LoadingSpinner from 'components/LoadingSpinner.vue';
 import { Schedule } from 'src/backend/schedule/dto/Schedule';
 import schedule from 'src/backend/schedule/SchedulePaddyBackendClient';
 import MainLayout from 'layouts/MainLayout.vue';
+import { Power } from 'src/backend/power/dto/Power';
+import OverView from 'pages/daemon/views/OverView.vue';
+import ScheduleView from 'pages/daemon/views/ScheduleView.vue';
+import StatisticsView from 'pages/daemon/views/StatisticsView.vue';
 
 const route = useRoute();
 const router = useRouter()
@@ -62,16 +59,20 @@ const daemonRef = ref<Daemon | undefined>({
   lastPing: 0
 })
 const daemonSchedules = ref<Array<Schedule>>([])
+const daemonPowers = ref<Array<Power>>([])
 
-const chart = ref<ApexCharts>()
-const pollIntervalId = setInterval(
-  async () => await Promise.all([loadChartData(), updateDaemonData()]),
-  10000
-);
+const pollIntervalId = setInterval(async () => await updateDaemonData(), 10000);
 
 onBeforeMount(async () => await updateDaemonData())
-onMounted(async () => await makeChart())
 onUnmounted(() => { clearInterval(pollIntervalId); });
+
+const routeView = computed((): 'OVER' | 'SCHD' | 'STAT' => {
+  const view = route.params?.view ?? 'OVER';
+
+  if (view == 'schedules') return 'SCHD'
+  else if (view == 'statistics') return 'STAT';
+  else return 'OVER';
+})
 
 const toggleDaemon = async () => {
   await daemon.toggle(daemonId.value as string)
@@ -92,144 +93,14 @@ const updateDaemonData = async () => {
   const dRes = await daemon.getDaemon(daemonId.value as string)
   if (!dRes) { return; }
   const sRes = (await schedule.getAllSchedules(daemonId.value as string)) ?? []
+  const pRes = (await power.getAllDaemonPowers(daemonId.value as string, { limit: 10 })) ?? []
 
   daemonRef.value = dRes;
   daemonSchedules.value = sRes;
-}
-
-const makeChart = async () => {
-  const options = {
-    chart: {
-      type: 'line',
-      toolbar: { show: false },
-      height: '90%'
-    },
-    title: {
-      text: 'Power Draw'
-    },
-    stroke: {
-      curve: 'smooth'
-    },
-    grid: {
-      borderColor: 'rgba(255,255,255,0.3)', // Color of the grid lines
-      strokeDashArray: 4, // Stroke dash array for dashed lines
-      yaxis: {
-        lines: {
-          show: true // Show horizontal grid lines
-        }
-      }
-    },
-    // dataLabels: {
-    //   enabled: true,
-    //   style: {
-    //     colors: ['#ff0000'] // Red color
-    //   }
-    // },
-    series: [],
-    xaxis: {},
-    noData: { text: 'Loading...' },
-  }
-
-  const newChart = new ApexCharts(document.querySelector("#power-chart"), options);
-  await newChart.render();
-  chart.value = newChart;
-
-  await loadChartData()
-}
-
-const loadChartData = async () => {
-  const powers = await power.getAllDaemonPowers(daemonId.value as string, { limit: 10 })
-  await chart.value?.updateOptions({
-    series: [{
-      name: 'Power Draw (W)',
-      data: powers.map(p => p.w),
-      color: '#aa0aaa'
-    }],
-    xaxis: {
-      categories: powers.map(p => new Date(p.timestamp * 1000)
-        .toLocaleTimeString('en-US', { hour12: false })),
-      labels: {
-        style: {
-          colors: powers.map(_ => 'ghostwhite')
-        }
-      }
-    },
-    yaxis: {
-      labels: {
-        maxTicks: 5,
-        style: {
-          colors: powers.map(_ => 'ghostwhite')
-        }
-      }
-    }
-  })
+  daemonPowers.value = pRes;
 }
 </script>
 
-<style lang="scss">
-body {
-  overflow-y: visible;
-}
-</style>
-
 <style scoped lang="scss">
-h4, h5 {
-  margin: 0;
-}
 
-#power-chart {
-  min-width: 80%;
-}
-
-#schedules {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.d-items-container {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.d-items-container > * {
-  flex: 1 1 auto;
-}
-
-.grid-container {
-  display: grid;
-  width: 100%;
-}
-
-.grid-container > div:nth-of-type(2) {
-  width: 100%;
-  border-top: ghostwhite 1px solid;
-  text-align: center;
-}
-
-.vertical {
-  display: flex;
-  justify-content: space-around;
-  flex-direction: column;
-}
-
-.q-btn {
-  min-width: 5rem;
-  color: ghostwhite;
-  border: ghostwhite 1px solid;
-}
-
-.horizontal {
-  display: flex;
-  gap: 1.5rem;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  padding: 0 1rem 0 1rem;
-}
-
-.name-chip-wrapper {
-  flex-wrap: nowrap !important;
-}
 </style>
