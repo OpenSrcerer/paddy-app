@@ -1,36 +1,34 @@
 <template>
 
-  <MainLayout>
-    <div style="height: 100vh" class="row items-center justify-evenly">
-      <div
-        id="container"
-        @keydown.enter.prevent="onLogin"
-      >
-        <div>
-          <h5>Email or Username:</h5>
-          <input class="input-form" type="text" v-model="emailOrUsernameForm">
-        </div>
-
-        <div>
-          <h5>Password:</h5>
-          <input class="input-form" type="password" v-model="passwordForm">
-        </div>
-
-        <q-btn push @click="onLogin">Login</q-btn>
-      </div>
-    </div>
-
-    <DialogComponent
-      v-model="alert"
-      title="Warning"
-      icon="report_problem"
-      close-button="OK"
+  <div style="height: 100vh" class="row items-center justify-evenly">
+    <div
+      id="container"
+      @keydown.enter.prevent="onLogin"
     >
-      <q-card-section class="q-pt-none">
-        {{ alertText }}
-      </q-card-section>
-    </DialogComponent>
-  </MainLayout>
+      <div>
+        <h5>Email or Username:</h5>
+        <input class="input-form" type="text" v-model="emailOrUsernameForm">
+      </div>
+
+      <div>
+        <h5>Password:</h5>
+        <input class="input-form" type="password" v-model="passwordForm">
+      </div>
+
+      <q-btn push @click="onLogin">Login</q-btn>
+    </div>
+  </div>
+
+  <DialogComponent
+    v-model="alert"
+    title="Warning"
+    icon="report_problem"
+    close-button="OK"
+  >
+    <q-card-section class="q-pt-none">
+      {{ alertText }}
+    </q-card-section>
+  </DialogComponent>
 
 </template>
 

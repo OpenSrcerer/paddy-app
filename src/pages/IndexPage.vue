@@ -1,22 +1,18 @@
 <template>
-  <MainLayout>
-    <q-page style="height: 100%" class="column items-center justify-center">
-      <h4><b>Welcome to the Paddy App!</b></h4>
-      <h6>Log in or sign up to get started!</h6>
+  <div style="height: 100vh" class="column items-center justify-center">
+    <h4><b>Welcome to the Paddy App!</b></h4>
+    <h6>Log in or sign up to get started!</h6>
 
-      <q-img src="~assets/webp/clyde_wave.webp"></q-img>
+    <q-img src="~assets/webp/clyde_wave.webp"></q-img>
 
-      <div id="container">
-        <q-btn push to="login">Login</q-btn>
-        <q-btn push to="signup">Sign Up</q-btn>
-      </div>
-    </q-page>
-  </MainLayout>
+    <div id="container">
+      <q-btn push to="login">Login</q-btn>
+      <q-btn push to="signup">Sign Up</q-btn>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-
-import MainLayout from 'layouts/MainLayout.vue';
 </script>
 
 <style scoped lang="scss">
