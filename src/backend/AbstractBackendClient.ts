@@ -1,23 +1,20 @@
 import axios, { isAxiosError, Method } from 'axios';
 import { isRetriesExceeded, RetriesExceededError } from 'src/backend/RetriesExceededError';
-import { SessionRoute } from 'src/backend/session/SessionRoute.enum';
-import { LoginResponseDto } from 'src/backend/session/dto/LoginResponseDto';
 import { PaddyRes } from 'src/backend/PaddyRes';
-import { pbkdf2 } from 'src/backend/WebCryptoPbkdf2';
-import router, { Router } from 'src/router';
+import { LocalStorage } from 'quasar';
+import { LoginCredential } from 'src/backend/session/dto/LoginCredential';
+import { LoginResponseDto } from 'src/backend/session/dto/LoginResponseDto';
+import { SessionRoute } from 'src/backend/session/SessionRoute.enum';
+import { Router } from 'src/router';
 
 export abstract class AbstractBackendClient {
 
   private static API_BASE_URL = 'https://mqtt.danielstefani.online/api/v1'
-  private static API_BACKOFF_TIME_MS = 3000
+  private static API_BACKOFF_TIME_MS = 1000
   private static API_MAX_RETRIES = 3
 
-  // ---- User Credentials that should be updated every login/logout ----
-  private static emailOrUsername: string | null = null
-  private static passwordHash: string | null = null
-
-  // ---- Update this JWT periodically as it expires quickly ----
-  private static jwt: string | null = null
+  // ---- Update this JWT periodically as it expires quickly (300s) ----
+  protected static jwt: string | null = null
 
   protected async request<T>(
     verb: Method,
@@ -25,7 +22,8 @@ export abstract class AbstractBackendClient {
     pathParams: Record<string, string> | null = null,
     queryParams: Record<string, string> | null = null,
     body: Record<string, string> | null = null,
-    retryCounter = 0
+    retryCounter = 0,
+    retry = true
   ): Promise<PaddyRes<T>> {
     const requestConfig = {
       method: verb,
@@ -73,8 +71,12 @@ export abstract class AbstractBackendClient {
           !!error?.response?.data ? JSON.stringify(error?.response?.data) : "<empty>")
 
         // Refresh JWT
-        if (error?.response?.status === 401) {
-          await this.login()
+        if (error?.response?.status === 401 && retry) {
+          await this.doRefresh()
+
+          // Try again
+          return this.request(verb, path, pathParams,
+            queryParams, body, retryCounter + 1)
         }
 
         return { code: error?.response?.status ?? 0, body: undefined }
@@ -85,30 +87,35 @@ export abstract class AbstractBackendClient {
     }
   }
 
-  // Get a new JWT if the user credentials are set
-  private async login() {
-    if (!AbstractBackendClient.emailOrUsername || !AbstractBackendClient.passwordHash) {
+  // Retrieves a short-lived generic token for application access
+  private async doRefresh() {
+    const refreshToken = LocalStorage.getItem(LoginCredential.REFRESH_TOKEN)
+    if (!refreshToken) {
       await Router.replace("/")
-      throw new Error("Credentials missing... cannot retrieve jwt!")
+      throw new Error("Refresh token missing... cannot retrieve jwt! Going back to login page.")
     }
+
+    // Replace JWT for subsequent refresh call
+    AbstractBackendClient.jwt = refreshToken as string
 
     // Retrieves the jwt
-    const res = await this.request<LoginResponseDto>("POST", SessionRoute.LOGIN, null, null,
-      {
-        emailOrUsername: AbstractBackendClient.emailOrUsername,
-        passwordHash: AbstractBackendClient.passwordHash
-      }
-    )
+    const res = await this.request<LoginResponseDto>("POST", SessionRoute.REFRESH, null, null, null, 0, false)
 
-    if (res.code == 404) {
-      throw new Error("User not found, please try again.")
+    // Handle expired refresh token
+    if (res.code != 200) {
+      await Router.replace("/")
+      LocalStorage.remove(LoginCredential.REFRESH_TOKEN)
+      throw new Error("Refresh token is probably expired... cannot retrieve jwt! Going back to login page.")
     }
 
-    if (res.code == 403) {
-      throw new Error("Invalid password provided, please try again.")
+    if (!res.body) {
+      await Router.replace("/")
+      LocalStorage.remove(LoginCredential.REFRESH_TOKEN)
+      throw new Error("Uh oh, server returned an invalid login response. Try again later.")
     }
 
-    AbstractBackendClient.jwt = res?.body?.jwt ?? null
+    // Inject the real JWT
+    AbstractBackendClient.jwt = res.body.jwt
   }
 
   private replacePathParams(path: string, pathParams: Record<string, string> | null) {
@@ -119,22 +126,8 @@ export abstract class AbstractBackendClient {
     return Object.keys(pathParams).reduce((url, paramKey) => {
       const placeholder = `:${paramKey}`;
       const value = encodeURIComponent(pathParams[paramKey]);
+
       return url.replace(placeholder, value);
     }, path);
-  }
-
-  /*
-  Updates this client's credentials with the given
-  username and hashed password.
-  Be careful with the user password, it should never
-  leave this function un-hashed!
-   */
-  protected async updateUserCredentials(usernameOrEmail: string, rawPassword: string) {
-    const derivedKey = await pbkdf2(rawPassword) // Base64
-
-    AbstractBackendClient.emailOrUsername = usernameOrEmail
-    AbstractBackendClient.passwordHash = derivedKey
-
-    await this.login()
   }
 }
