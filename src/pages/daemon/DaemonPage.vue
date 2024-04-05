@@ -73,8 +73,12 @@ const routeView = computed((): 'OVER' | 'SCHD' | 'STAT' => {
 })
 
 const toggleDaemon = async () => {
+  if (daemonRef.value) {
+    daemonRef.value.on = !daemonRef.value?.on
+  }
+  
   await daemon.toggle(daemonId.value as string)
-  await updateDaemonData()
+  await daemon.getDaemon(daemonId.value as string)
 }
 
 const resetDaemon = async () => {
