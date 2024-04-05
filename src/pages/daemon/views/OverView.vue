@@ -7,10 +7,6 @@
 <!--          <q-btn @click="deleteDaemon">Delete</q-btn>-->
 <!--        </div>-->
 <!--      </div>-->
-
-<!--      <div id="schedules">-->
-<!--        <h5 v-for="schedule in daemonSchedules" :key="schedule.id">{{ schedule.periodic }}</h5>-->
-<!--      </div>-->
     </div>
 
     <div class="horizontal">
@@ -20,9 +16,8 @@
 </template>
 
 <script setup lang="ts">
-
 import ApexCharts from 'apexcharts';
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { Power } from 'src/backend/power/dto/Power';
 
 interface OverViewProps {
@@ -32,6 +27,7 @@ interface OverViewProps {
 const props = withDefaults(defineProps<OverViewProps>(), { powers: () => [] })
 const chart = ref<ApexCharts>()
 
+onMounted(async () => await makeChart())
 watch(() => props.powers, async () => await makeChart())
 
 const makeChart = async () => {
@@ -104,9 +100,6 @@ const loadChartData = async () => {
 </script>
 
 <style lang="scss">
-body {
-  overflow-y: visible;
-}
 </style>
 
 <style scoped lang="scss">

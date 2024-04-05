@@ -1,6 +1,11 @@
 <template>
 
-  <MainLayout>
+  <MainLayout :links="[{
+    title: 'Add a Daemon',
+    caption: 'Add a new daemon to your list!',
+    icon: 'add_circle_outline',
+    action: onAddNewBtnClick
+  }]">
     <div id="container">
 
       <LoadingSpinner v-if="!daemons"/>
@@ -26,8 +31,6 @@
         <p>Why don't you get some?</p>
       </div>
     </div>
-
-    <q-icon id="add-daemon-btn" name="add" @click="onAddNewBtnClick"/>
 
     <DialogComponent
       v-model="alert"
@@ -279,10 +282,6 @@ const onConfigDaemon = async () => {
 </style>
 
 <style scoped lang="scss">
-body {
-  overflow-y: hidden;
-}
-
 .q-img {
   width: 75%;
 }
@@ -305,20 +304,6 @@ body {
   align-items: center;
   width: 100%;
   height: 100%;
-}
-
-#add-daemon-btn {
-  position: fixed;
-  font-size: 7em;
-  bottom: 10vh;
-  right: 5vw;
-  color: ghostwhite;
-  transition: all 150ms ease-in-out;
-  cursor: pointer;
-  z-index: 10;
-  background-color: $dark;
-  border: 1px ghostwhite solid;
-  border-radius: 5rem;
 }
 
 #add-daemon-btn:hover {

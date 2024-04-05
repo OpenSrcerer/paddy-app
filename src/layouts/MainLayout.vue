@@ -29,11 +29,11 @@
         <q-item-label
           header
         >
-          Quick Links
+          Daemon Menu
         </q-item-label>
 
         <EssentialLink
-          v-for="link in links"
+          v-for="link in allLinks"
           :key="link.title"
           v-bind="link"
         />
@@ -47,28 +47,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import EssentialLink, { EssentialLinkProps } from 'components/EssentialLink.vue';
+import { LocalStorage } from 'quasar';
+import { LoginCredential } from 'src/backend/session/dto/LoginCredential';
 
 export interface MainLayoutProps {
   links?: EssentialLinkProps[]
 }
 const props = withDefaults(defineProps<MainLayoutProps>(), {
-  links: () => [
-    {
-      title: 'My Blog',
-      caption: 'danielstefani.online',
-      icon: 'school',
-      link: 'https://danielstefani.online'
-    },
-    {
-      title: 'Route Test',
-      caption: 'aha astaras',
-      icon: 'school',
-      route: '/daemon/4'
-    }
-  ]
+  links: () => []
 })
+
+const allLinks = computed(() => [
+  ...props.links,
+  {
+    title: 'Logout',
+    caption: '',
+    icon: 'logout',
+    route: '/',
+    action() { LocalStorage.remove(LoginCredential.REFRESH_TOKEN) },
+  }
+])
 
 const leftDrawerOpen = ref(false)
 

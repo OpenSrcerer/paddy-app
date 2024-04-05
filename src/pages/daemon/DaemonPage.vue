@@ -1,6 +1,6 @@
 <template>
 
-  <MainLayout>
+  <MainLayout :links="expandLinks">
     <template #toolbar>
       <DaemonComponent :dense="true" :daemon="daemonRef"/>
       <q-toggle
@@ -14,31 +14,29 @@
     <div v-if="!!daemonRef">
       <OverView
         v-if="routeView == 'OVER'"
-
         :powers="daemonPowers"
       />
-      <ScheduleView v-else-if="routeView == 'SCHD'"/>
+      <ScheduleView
+        v-else-if="routeView == 'SCHD'"
+        :schedules="daemonSchedules"
+      />
       <StatisticsView v-else-if="routeView == 'STAT'"/>
     </div>
 
     <div v-else class="column items-center justify-center">
       <LoadingSpinner/>
     </div>
-
   </MainLayout>
 
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeMount, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onBeforeMount, onUnmounted, ref } from 'vue';
 import daemon from 'src/backend/daemon/DaemonPaddyBackendClient';
 import { useRoute, useRouter } from 'vue-router';
 import { init, reset } from 'src/bluetooth/BleService';
-import moment from 'moment';
-import ApexCharts from 'apexcharts';
 import power from 'src/backend/power/PowerPaddyBackendClient';
-import * as apexcharts from 'apexcharts';
-import { Daemon, getBadgeColor, getDaemonStatus } from 'src/backend/daemon/dto/Daemon';
+import { Daemon } from 'src/backend/daemon/dto/Daemon';
 import DaemonComponent from 'components/DaemonComponent.vue';
 import LoadingSpinner from 'components/LoadingSpinner.vue';
 import { Schedule } from 'src/backend/schedule/dto/Schedule';
@@ -99,8 +97,28 @@ const updateDaemonData = async () => {
   daemonSchedules.value = sRes;
   daemonPowers.value = pRes;
 }
+
+const expandLinks = [
+  {
+    title: 'Daemon',
+    caption: 'Overview for your Daemon',
+    icon: 'space_dashboard',
+    route: '/daemon/4'
+  },
+  {
+    title: 'Schedules',
+    caption: 'Toggle your Daemon on a schedule',
+    icon: 'timer',
+    route: '/daemon/4/schedules'
+  },
+  {
+    title: 'Insights',
+    caption: 'View your Daemon\'s statistics',
+    icon: 'insights',
+    route: '/daemon/4/statistics'
+  }
+]
 </script>
 
 <style scoped lang="scss">
-
 </style>

@@ -13,6 +13,20 @@
 </template>
 
 <script setup lang="ts">
+
+import { onBeforeMount } from 'vue';
+import { LocalStorage } from 'quasar';
+import { LoginCredential } from 'src/backend/session/dto/LoginCredential';
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
+
+onBeforeMount(async () => {
+  if (LocalStorage.has(LoginCredential.REFRESH_TOKEN)) {
+    await router.replace("/home");
+  }
+})
+
 </script>
 
 <style scoped lang="scss">

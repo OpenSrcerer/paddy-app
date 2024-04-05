@@ -1,21 +1,22 @@
 <template>
   <q-item
     clickable
-    :tag="!!route ? null : 'a'"
-    :target="!!route ? null : '_blank'"
-    :href="!!route ? null : link"
-    @click.prevent="onRouteLink"
+    :class="!active ? undefined : 'active-link'"
+    :tag="!!route ? undefined : 'a'"
+    :target="!!route ? undefined : '_blank'"
+    :href="!!route ? undefined : link"
+    @click.prevent="onClick"
   >
     <q-item-section
       v-if="icon"
       avatar
     >
-      <q-icon :name="icon" />
+      <q-icon :class="!active ? undefined : 'active-link'" :name="icon" />
     </q-item-section>
 
     <q-item-section>
-      <q-item-label>{{ title }}</q-item-label>
-      <q-item-label caption>{{ caption }}</q-item-label>
+      <q-item-label :class="!active ? undefined : 'active-link'">{{ title }}</q-item-label>
+      <q-item-label :class="!active ? undefined : 'active-link'" caption>{{ caption }}</q-item-label>
     </q-item-section>
   </q-item>
 </template>
@@ -31,19 +32,25 @@ export interface EssentialLinkProps {
   link?: string;
   route?: string;
   icon?: string;
+  active?: boolean;
+  action?: () => any
 }
 const props = withDefaults(defineProps<EssentialLinkProps>(), {
   caption: '',
   link: '#',
   icon: '',
+  active: false
 });
 
-const onRouteLink = async () => {
-  if (!props.route) return;
-
-  await router.replace(props.route)
+const onClick = async () => {
+  if (!!props.action) { props.action() }
+  if (!!props.route) { await router.replace(props.route) }
 }
 </script>
 
 <style scoped lang="scss">
+.active-link {
+  background-color: ghostwhite;
+  color: black;
+}
 </style>

@@ -37,7 +37,6 @@ import { ref } from 'vue';
 import session from 'src/backend/session/SessionPaddyBackendClient';
 import { useRouter } from 'vue-router';
 import DialogComponent from 'components/DialogComponent.vue';
-import MainLayout from 'layouts/MainLayout.vue';
 
 const router = useRouter()
 
@@ -61,12 +60,6 @@ const onLogin = async () => {
   }
 }
 </script>
-
-<style lang="scss">
-body {
-  overflow-y: hidden;
-}
-</style>
 
 <style scoped lang="scss">
 h5 {
