@@ -68,7 +68,7 @@
     <q-page-container
       v-touch-swipe.right="openLeftDrawer"
       v-touch-swipe.left="closeLeftDrawer"
-      style="height: 100vh"
+      style="height: 100dvh"
     >
       <slot/>
     </q-page-container>
