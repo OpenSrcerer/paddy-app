@@ -102,11 +102,20 @@ async function connectDaemon(): Promise<BleDevice> {
     )
   }
 
-  console.log('[BleService] Requesting BLE device with capabilities...');
-  const device = await BleClient.requestDevice({
-    services: [BLE_SERVICE_UUID],
-    scanMode: ScanMode.SCAN_MODE_BALANCED
-  });
+  console.log('[BleService] Requesting BLE device with daemon capabilities...');
+
+  let device;
+  try {
+    device = await BleClient.requestDevice({
+      services: [BLE_SERVICE_UUID],
+      scanMode: ScanMode.SCAN_MODE_BALANCED
+    });
+  } catch (e) {
+    throw new Error(
+      "Could not find a suitable Daemon.\n" +
+      "Please try again."
+    )
+  }
 
   // connect to device, the onDisconnect callback is optional
   await BleClient.connect(device.deviceId, (deviceId) => onDisconnect(deviceId));
