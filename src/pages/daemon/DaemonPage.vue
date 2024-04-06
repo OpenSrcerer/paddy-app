@@ -1,6 +1,6 @@
 <template>
 
-  <MainLayout :links="expandLinks">
+  <MainLayout :navLinks="navLinks" :actionLinks="actionLinks">
     <template #toolbar>
       <DaemonComponent v-if="!!daemonRef" :dense="true" :daemon="daemonRef"/>
       <q-toggle
@@ -99,7 +99,21 @@ const updateDaemonData = async () => {
   daemonPowers.value = pRes;
 }
 
-const expandLinks = [
+const actionLinks = [
+  {
+    title: 'Reset Daemon',
+    caption: 'To change saved WiFi credentials',
+    icon: 'build'
+  },
+  {
+    title: 'Delete Daemon',
+    caption: 'Resets & Deletes your Daemon',
+    icon: 'delete_forever',
+    dangerous: true
+  },
+]
+
+const navLinks = [
   {
     title: 'Daemon',
     caption: 'Overview for your Daemon',

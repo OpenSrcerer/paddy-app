@@ -34,8 +34,31 @@
           Daemon Menu
         </q-item-label>
 
+        <!-- Navigation Links -->
+        <div v-if="navLinks.length">
+          <EssentialLink
+            v-for="link in navLinks"
+            :key="link.title"
+            v-bind="link"
+            :active="isLinkActive(link)"
+          />
+          <hr>
+        </div>
+
+        <!-- Management Links -->
+        <div v-if="actionLinks.length">
+          <EssentialLink
+            v-for="link in actionLinks"
+            :key="link.title"
+            v-bind="link"
+            :active="isLinkActive(link)"
+          />
+          <hr>
+        </div>
+
+        <!-- Default Links -->
         <EssentialLink
-          v-for="link in allLinks"
+          v-for="link in defaultLinks"
           :key="link.title"
           v-bind="link"
         />
@@ -53,34 +76,44 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import EssentialLink, { EssentialLinkProps } from 'components/EssentialLink.vue';
 import { LocalStorage } from 'quasar';
 import { LoginCredential } from 'src/backend/session/dto/LoginCredential';
+import { useRoute } from 'vue-router';
+
+const route = useRoute()
 
 export interface MainLayoutProps {
-  links?: EssentialLinkProps[]
+  navLinks?: EssentialLinkProps[],
+  actionLinks?: EssentialLinkProps[],
 }
 const props = withDefaults(defineProps<MainLayoutProps>(), {
-  links: () => []
+  navLinks: () => [],
+  actionLinks: () => []
 })
-
-const allLinks = computed(() => [
-  ...props.links,
-  {
-    title: 'Logout',
-    caption: '',
-    icon: 'logout',
-    route: '/',
-    action() { LocalStorage.remove(LoginCredential.REFRESH_TOKEN) },
-  }
-])
 
 const leftDrawerOpen = ref(false)
 
 const toggleLeftDrawer = () => leftDrawerOpen.value = !leftDrawerOpen.value
 const openLeftDrawer = () => leftDrawerOpen.value = true
 const closeLeftDrawer = () => leftDrawerOpen.value = false
+
+const defaultLinks = [
+  {
+    title: 'Logout',
+    caption: '',
+    icon: 'logout',
+    route: '/',
+    action() { LocalStorage.remove(LoginCredential.REFRESH_TOKEN) },
+    dangerous: true
+  }
+]
+
+const isLinkActive = (link: EssentialLinkProps): boolean => {
+  if (!link.route) return false
+  return route.path.endsWith(link.route);
+}
 </script>
 
 <style lang="scss">
@@ -107,8 +140,6 @@ const closeLeftDrawer = () => leftDrawerOpen.value = false
 </style>
 
 <style scoped lang="scss">
-
-
 .q-toolbar__title h5 {
   margin: 0;
 }

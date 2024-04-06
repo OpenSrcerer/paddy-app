@@ -1,6 +1,6 @@
 <template>
 
-  <MainLayout :links="[{
+  <MainLayout :action-links="[{
     title: 'Add a Daemon',
     caption: 'Add a new daemon to your list!',
     icon: 'add_circle_outline',
