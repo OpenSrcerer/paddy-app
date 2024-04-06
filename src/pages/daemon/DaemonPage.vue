@@ -2,8 +2,9 @@
 
   <MainLayout :links="expandLinks">
     <template #toolbar>
-      <DaemonComponent :dense="true" :daemon="daemonRef"/>
+      <DaemonComponent v-if="!!daemonRef" :dense="true" :daemon="daemonRef"/>
       <q-toggle
+        v-if="!!daemonRef"
         :model-value="daemonRef.on"
         icon="bolt"
         size="3rem"
@@ -51,11 +52,7 @@ const route = useRoute();
 const router = useRouter()
 
 const daemonId = ref(route.params.id)
-const daemonRef = ref<Daemon | undefined>({
-  id: daemonId.value as string,
-  on: false,
-  lastPing: 0
-})
+const daemonRef = ref<Daemon | undefined>(undefined)
 const daemonSchedules = ref<Array<Schedule>>([])
 const daemonPowers = ref<Array<Power>>([])
 
@@ -76,7 +73,7 @@ const toggleDaemon = async () => {
   if (daemonRef.value) {
     daemonRef.value.on = !daemonRef.value?.on
   }
-  
+
   await daemon.toggle(daemonId.value as string)
   await daemon.getDaemon(daemonId.value as string)
 }
