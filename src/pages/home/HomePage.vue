@@ -320,7 +320,8 @@ const actionLinks = [{
 }
 
 #scroll-container {
-  height: 100vh;
+  position: absolute;
+  height: 100%;
   width: 100%;
 }
 
