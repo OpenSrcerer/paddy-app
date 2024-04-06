@@ -70,6 +70,9 @@ const randomQuotes = [
   height: 100vh;
   margin: 0 auto;
   justify-content: center;
+  text-align: center;
+  flex-wrap: wrap;
+  line-break: loose;
 }
 
 #loading-spinner {
