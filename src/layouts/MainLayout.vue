@@ -1,5 +1,7 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout
+    view="lHh Lpr lFf"
+  >
     <q-header>
       <q-toolbar>
         <q-btn
@@ -40,7 +42,11 @@
       </q-list>
     </q-drawer>
 
-    <q-page-container style="height: 100vh">
+    <q-page-container
+      v-touch-swipe.right="openLeftDrawer"
+      v-touch-swipe.left="closeLeftDrawer"
+      style="height: 100vh"
+    >
       <slot/>
     </q-page-container>
   </q-layout>
@@ -73,6 +79,8 @@ const allLinks = computed(() => [
 const leftDrawerOpen = ref(false)
 
 const toggleLeftDrawer = () => leftDrawerOpen.value = !leftDrawerOpen.value
+const openLeftDrawer = () => leftDrawerOpen.value = true
+const closeLeftDrawer = () => leftDrawerOpen.value = false
 </script>
 
 <style lang="scss">
