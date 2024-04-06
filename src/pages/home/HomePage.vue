@@ -28,6 +28,7 @@
             @click="toggleDaemon(daemon.id)"
           />
         </div>
+        <br>
       </q-pull-to-refresh>
     </q-scroll-area>
 
@@ -303,12 +304,6 @@ const actionLinks = [{
 .q-chip__icon {
   color: inherit;
 }
-
-.q-pull-to-refresh__content {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
 </style>
 
 <style scoped lang="scss">
@@ -322,11 +317,10 @@ const actionLinks = [{
 
 .daemon-container {
   max-width: 50%;
-  margin: 0 auto;
+  margin: 1.75rem auto;
 }
 
 #scroll-container {
-  padding-top: 2rem;
   height: 100vh;
   width: 100%;
 }

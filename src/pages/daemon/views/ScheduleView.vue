@@ -12,6 +12,7 @@
         @delete="deleteSchedule"
         :schedule="schedule"
       />
+      <br>
     </q-pull-to-refresh>
   </q-scroll-area>
 </template>
@@ -38,19 +39,10 @@ const deleteSchedule = (scheduleId: string) => {
 watchEffect(() => props.schedules)
 </script>
 
-<style lang="scss">
-.q-pull-to-refresh__content {
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
-  width: 100%;
-  height: 100%;
-}
-</style>
-
 <style scoped lang="scss">
-.schedule-wrapper:first-child {
-  margin-top: 2rem;
+.schedule-wrapper {
+  margin-top: 3rem;
+  width: 50%;
 }
 
 #schedule-puller {
