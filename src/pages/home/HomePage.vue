@@ -141,6 +141,9 @@ const setupFinish         = ref<boolean>(false);
 onMounted(async () => await loadDaemons())
 
 const toggleDaemon = async (daemonId: string) => {
+  const found = (daemons.value as Array<Daemon>).find(daemon => daemon.id == daemonId)
+  if (found) found.on = !found.on
+
   await daemon.toggle(daemonId)
   await loadDaemons()
 }
@@ -311,13 +314,9 @@ const actionLinks = [{
   width: 75%;
 }
 
-.daemon-container:last-child {
-  margin-bottom: 2rem;
-}
-
 .daemon-container {
   max-width: 50%;
-  margin: 1.75rem auto;
+  margin: 1.75rem auto 0 auto;
 }
 
 #scroll-container {
