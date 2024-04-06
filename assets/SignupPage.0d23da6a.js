@@ -1,0 +1,1 @@
+import{Q as e}from"./QPage.827fe9fe.js";import{_ as t,o as a,c as o,w as r,f as s}from"./index.e24f0186.js";import"./render.294d024f.js";const c={},n=s("h4",null,"Welcome",-1);function _(f,i){return a(),o(e,{class:"row items-center justify-evenly"},{default:r(()=>[n]),_:1})}var u=t(c,[["render",_]]);export{u as default};
