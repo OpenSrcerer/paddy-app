@@ -13,7 +13,6 @@
         id="scroll-container"
         @refresh="loadDaemons"
         color="ghostwhite"
-        bg-color="black"
         icon="autorenew"
       >
         <div class="daemon-container wrap"
@@ -148,7 +147,7 @@ const loadDaemons = async (done: (() => void) | undefined = undefined) => {
   daemons.value = await daemon.getAllUserDaemons()
   if (!!done) done()
 }
-const onDaemonClick = (daemonId: number) => router.push(`daemon/${daemonId}`)
+const onDaemonClick = (daemonId: string) => router.push(`daemon/${daemonId}`)
 
 // ---- Setup Flow ----
 const onAddNewBtnClick = () => {
@@ -310,11 +309,6 @@ const actionLinks = [{
   flex-direction: column;
   gap: 2rem;
 }
-
-// Stupid component with preset values
-.q-pull-to-refresh__puller-container {
-  left: 0 !important;
-}
 </style>
 
 <style scoped lang="scss">
@@ -363,7 +357,7 @@ const actionLinks = [{
   cursor: pointer;
 }
 
-@media (max-width: 1052px) {
+@media (max-width: 1180px) {
   .daemon-container {
     justify-content: center;
   }

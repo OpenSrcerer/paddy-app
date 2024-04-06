@@ -16,14 +16,14 @@ class SchedulePaddyBackendClient extends AbstractBackendClient {
     return res.body ?? []
   }
 
-  async createSchedule(id: string, daemonId: string): Promise<Schedule | undefined> {
+  async createSchedule(schedule: Schedule, daemonId: string): Promise<Schedule | undefined> {
     const res = await this.request<Schedule>
-      ("POST", ScheduleRoute.CREATE_SCHEDULE, null, null, { id, daemonId })
+      ("POST", ScheduleRoute.CREATE_SCHEDULE, { daemonId }, null, schedule)
     return res.body ?? undefined
   }
 
-  async patchSchedule(id: string, daemonId: string) {
-    await this.request("PATCH", ScheduleRoute.UPDATE_SCHEDULE, { id, daemonId })
+  async patchSchedule(schedule: Partial<Schedule>, daemonId: string) {
+    await this.request("PATCH", ScheduleRoute.UPDATE_SCHEDULE, { daemonId }, null, schedule)
   }
 
   async delete(id: string, daemonId: string) {

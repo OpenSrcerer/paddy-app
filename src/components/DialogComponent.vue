@@ -13,8 +13,9 @@
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn v-if="!!props.closeButton" :label="props.closeButton.toUpperCase()" v-close-popup />
+        <q-btn class="dialog-button" v-if="!!props.closeButton" :label="props.closeButton.toUpperCase()" v-close-popup />
         <q-btn
+          :class="dangerous ? 'dialog-button-dangerous' : 'dialog-button'"
           v-for="button in props.buttons"
           :key="button"
           :label="button.toUpperCase()"
@@ -31,11 +32,13 @@ export interface DialogProps {
   icon?: string,
   closeButton?: string
   buttons?: string[]
+  dangerous?: boolean
 }
 const props = withDefaults(defineProps<DialogProps>(), {
   title: 'Alert',
   icon: 'help_outline',
-  buttons: () => [] // arrow function is necessary here idk why please god save me
+  buttons: () => [],
+  dangerous: true
 })
 
 const model = defineModel<boolean>();
@@ -50,7 +53,12 @@ const model = defineModel<boolean>();
   min-width: 25vw;
 }
 
-.q-btn {
+.dialog-button-dangerous {
+  color: #ff3030;
+  border: #ff3030 1px solid;
+}
+
+.dialog-button {
   min-width: 5rem;
   color: ghostwhite;
   border: ghostwhite 1px solid;

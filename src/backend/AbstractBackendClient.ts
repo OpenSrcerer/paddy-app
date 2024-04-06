@@ -21,7 +21,7 @@ export abstract class AbstractBackendClient {
     path: string,
     pathParams: Record<string, string> | null = null,
     queryParams: Record<string, string> | null = null,
-    body: Record<string, string> | null = null,
+    body: Record<string, any> | null = null,
     retryCounter = 0,
     retry = true
   ): Promise<PaddyRes<T>> {

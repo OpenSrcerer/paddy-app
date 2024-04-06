@@ -78,7 +78,7 @@ const getTextClass = computed(() => {
 }
 
 .active-link {
-  color: black;
+  color: $dark;
 }
 
 .dangerous {

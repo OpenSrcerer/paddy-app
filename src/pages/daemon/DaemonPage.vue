@@ -31,18 +31,20 @@
       <div v-else-if="shouldReset">
         <p>
           Are you sure you want to reset your Daemon?
-          <br>
+          <br><br>
           To recover your daemon, go to the home screen and tap <b>Add / Recover Daemon</b>.
-          <br>
-          Your data will not be deleted.
+          <br><br>
+          Your data will <b>not</b> be deleted.
         </p>
       </div>
 
       <div v-else>
         <p>
           Are you sure you want to delete your Daemon?
-          <br>
-          You can re-add your daemon anytime from the home screen, but <b>all your data will be gone forever</b>.
+          <br><br>
+          <b>All your daemon data will be erased.</b> That means all your schedules and power measurements will be gone.
+          <br><br>
+          You can re-add your daemon anytime from the home screen by tapping <b>Add / Recover Daemon</b>.
         </p>
       </div>
     </DialogComponent>
@@ -55,6 +57,7 @@
       <ScheduleView
         v-else-if="routeView == 'SCHD'"
         :schedules="daemonSchedules"
+        @reload="reloadSchedules"
       />
       <StatisticsView v-else-if="routeView == 'STAT'"/>
     </div>
@@ -146,6 +149,11 @@ const updateDaemonData = async () => {
   daemonRef.value = dRes;
   daemonSchedules.value = sRes;
   daemonPowers.value = pRes;
+}
+
+const reloadSchedules = async (done: () => void) => {
+  daemonSchedules.value = (await schedule.getAllSchedules(daemonId.value)) ?? []
+  done()
 }
 
 const daemonIsOnline = computed(() => getDaemonStatus(daemonRef.value as Daemon) == "Online")

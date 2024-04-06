@@ -27,6 +27,16 @@ h1, h2, h3, h4, h5, h6, p, button,
   color: gray;
 }
 
+// Stupid component with preset values
+.q-pull-to-refresh__puller-container {
+  left: 0 !important;
+}
+
+.q-pull-to-refresh__puller {
+  color: ghostwhite;
+  border: 1px ghostwhite solid;
+}
+
 // ---- Fonts ----
 @font-face {
   font-family: "Fira Sans";
