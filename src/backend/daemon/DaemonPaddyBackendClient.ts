@@ -25,6 +25,10 @@ class DaemonPaddyBackendClient extends AbstractBackendClient {
     await this.request("PATCH", DaemonRoute.TOGGLE_DAEMON, { id })
   }
 
+  async reset(id: string) {
+    await this.request("PATCH", DaemonRoute.RESET_DAEMON, { id })
+  }
+
   async delete(id: string) {
     await this.request("DELETE", DaemonRoute.DELETE_DAEMON, { id })
   }

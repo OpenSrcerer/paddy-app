@@ -1,6 +1,7 @@
 <template>
   <q-item
     clickable
+    :disable="disable"
     :class="!active ? undefined : 'active-link active-link-background'"
     :tag="!!route ? undefined : 'a'"
     :target="!!route ? undefined : '_blank'"
@@ -37,6 +38,7 @@ export interface EssentialLinkProps {
   icon?: string;
   active?: boolean;
   dangerous?: boolean;
+  disable?: boolean;
   action?: () => any
 }
 const props = withDefaults(defineProps<EssentialLinkProps>(), {
@@ -44,6 +46,7 @@ const props = withDefaults(defineProps<EssentialLinkProps>(), {
   link: '#',
   icon: '',
   active: false,
+  disable: false,
   dangerous: false
 });
 

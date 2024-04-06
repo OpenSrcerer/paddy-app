@@ -1,16 +1,21 @@
 <template>
 
-  <MainLayout :action-links="[{
-    title: 'Add a Daemon',
-    caption: 'Add a new daemon to your list!',
-    icon: 'add_circle_outline',
-    action: onAddNewBtnClick
-  }]">
-    <div id="container">
+  <MainLayout :action-links="actionLinks">
 
-      <LoadingSpinner v-if="!daemons"/>
+    <LoadingSpinner v-if="!daemons"/>
 
-      <q-scroll-area v-else-if="!!(daemons as Array<Daemon>).length" class="column" id="scroll-container">
+    <q-scroll-area
+      v-else-if="!!(daemons as Array<Daemon>).length"
+      class="column"
+      id="container"
+    >
+      <q-pull-to-refresh
+        id="scroll-container"
+        @refresh="loadDaemons"
+        color="ghostwhite"
+        bg-color="black"
+        icon="autorenew"
+      >
         <div class="daemon-container wrap"
              v-for="daemon in daemons" :key="daemon.id"
              @click="onDaemonClick(daemon.id)"
@@ -24,12 +29,12 @@
             @click="toggleDaemon(daemon.id)"
           />
         </div>
-      </q-scroll-area>
+      </q-pull-to-refresh>
+    </q-scroll-area>
 
-      <div v-else style="height: 100%" class="column items-center">
-        <h4>No daemons here.</h4>
-        <p>Why don't you get some?</p>
-      </div>
+    <div v-else style="height: 100%" class="column items-center">
+      <h4>No daemons here.</h4>
+      <p>Why don't you get some?</p>
     </div>
 
     <DialogComponent
@@ -133,13 +138,15 @@ const setupEUsername      = ref<string>('');
 const setupEPassword      = ref<string>('');
 const setupFinish         = ref<boolean>(false);
 
-onMounted(async () => {
-  daemons.value = await daemon.getAllUserDaemons()
-})
+onMounted(async () => await loadDaemons())
 
 const toggleDaemon = async (daemonId: string) => {
   await daemon.toggle(daemonId)
+  await loadDaemons()
+}
+const loadDaemons = async (done: (() => void) | undefined = undefined) => {
   daemons.value = await daemon.getAllUserDaemons()
+  if (!!done) done()
 }
 const onDaemonClick = (daemonId: number) => router.push(`daemon/${daemonId}`)
 
@@ -237,6 +244,18 @@ const onConfigDaemon = async () => {
       alert.value = true;
       return;
   }
+
+  if (!daemonRes) {
+    alertTitle.value = 'Failed to add Daemon'
+    alertIcon.value = 'error_outline'
+    alertErrorText.value = `We were unable to contact our servers.
+        Please check your network connection and try again. Server Response: ${daemonRes}`
+    alertEventButtons.value = [];
+    alertCloseButton.value = "OK";
+    alert.value = true;
+    return;
+  }
+
   store.jwt = daemonRes.jwt
 
   try {
@@ -262,6 +281,12 @@ const onConfigDaemon = async () => {
   daemons.value = await daemon.getAllUserDaemons()
 }
 
+const actionLinks = [{
+  title: 'Add / Recover Daemon',
+  caption: 'Add a new daemon to your list, or recover an existing one',
+  icon: 'add_circle_outline',
+  action: onAddNewBtnClick
+}]
 </script>
 
 <style lang="scss">
@@ -279,11 +304,26 @@ const onConfigDaemon = async () => {
 .q-chip__icon {
   color: inherit;
 }
+
+.q-pull-to-refresh__content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+// Stupid component with preset values
+.q-pull-to-refresh__puller-container {
+  left: 0 !important;
+}
 </style>
 
 <style scoped lang="scss">
 .q-img {
   width: 75%;
+}
+
+.daemon-container:last-child {
+  margin-bottom: 2rem;
 }
 
 .daemon-container {
@@ -295,7 +335,6 @@ const onConfigDaemon = async () => {
   padding-top: 2rem;
   height: 100vh;
   width: 100%;
-  gap: 10px;
 }
 
 #container {
