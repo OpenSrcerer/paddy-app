@@ -1,11 +1,10 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    <h4>Welcome</h4>
-  </q-page>
+  <NoXyzHere title="Nothing here yet" caption="Working on it..."/>
 </template>
 
 <script setup lang="ts">
 
+import NoXyzHere from 'components/NoXyzHere.vue';
 </script>
 
 <style scoped lang="scss">
