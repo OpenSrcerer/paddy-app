@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model="model">
+  <q-dialog v-model="model" @hide="emit('closed')">
     <q-card>
       <q-card-section class="row items-center">
         <q-icon style="margin-right: 0.5rem; font-size: 1.5rem;" id="dialog_icon" :name="props.icon"/>
@@ -38,9 +38,10 @@ const props = withDefaults(defineProps<DialogProps>(), {
   title: 'Alert',
   icon: 'help_outline',
   buttons: () => [],
-  dangerous: true
+  dangerous: false
 })
 
+const emit = defineEmits(['closed']);
 const model = defineModel<boolean>();
 </script>
 

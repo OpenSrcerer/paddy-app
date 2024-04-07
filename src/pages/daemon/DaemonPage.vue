@@ -8,24 +8,33 @@
         :model-value="daemonRef.on"
         icon="bolt"
         size="3rem"
-        @click="toggleDaemon"
+        :disable="getDaemonStatus(daemonRef) == 'Unknown'"
+        @click="toggleButtonEvent"
       />
     </template>
 
     <DialogComponent
       v-model="alert"
 
-      :icon="shouldReset ? 'build' : 'delete_forever'"
-      :title="shouldReset ? 'Daemon Reset' : 'Daemon Delete'"
+      :icon="scheduleToDelete ? 'timer_off' : shouldReset ? 'build' : 'delete_forever'"
+      :title="scheduleToDelete ? 'Schedule Delete' : shouldReset ? 'Daemon Reset' : 'Daemon Delete'"
       close-button="Cancel"
       :persistent="false"
-      :buttons="alertError ? [] : shouldReset ? ['reset'] : ['delete']"
+      :buttons="scheduleToDelete ? ['Remove'] : alertError ? [] : shouldReset ? ['reset'] : ['delete']"
+      :dangerous="true"
 
       @reset="deleteResetDaemon"
       @delete="deleteResetDaemon"
+      @remove="deleteSchedule"
+      @closed="resetAlert"
     >
       <div v-if="alertError">
         <p>{{ alertError }}</p>
+      </div>
+
+      <div v-else-if="scheduleToDelete">
+        <p>Are you sure you want to delete this schedule?</p>
+        <p>Your daemon will no longer turn on/off at the specified time.</p>
       </div>
 
       <div v-else-if="shouldReset">
@@ -57,7 +66,10 @@
       <ScheduleView
         v-else-if="routeView == 'SCHD'"
         :schedules="daemonSchedules"
+
         @reload="reloadSchedules"
+        @delete="scheduleDeleteAlert"
+        @close="resetAlert"
       />
       <StatisticsView v-else-if="routeView == 'STAT'"/>
     </div>
@@ -93,6 +105,7 @@ const router = useRouter()
 const alert = ref<boolean>(false)
 const alertError = ref<string | undefined>(undefined)
 const shouldReset = ref<boolean>(false)
+const scheduleToDelete = ref<string | undefined>(undefined)
 
 const daemonId = ref<string>(route.params.id as string)
 const daemonRef = ref<Daemon | undefined>(undefined)
@@ -103,6 +116,10 @@ const pollIntervalId = setInterval(async () => await updateDaemonData(), 10000);
 
 onBeforeMount(async () => await updateDaemonData())
 onUnmounted(() => { clearInterval(pollIntervalId); });
+
+const daemonIsOnline = computed(() => getDaemonStatus(daemonRef.value as Daemon) == 'Online')
+const toggleButtonEvent = computed(() => getDaemonStatus(
+  daemonRef.value as Daemon) == 'Unknown' ? undefined : toggleDaemon)
 
 const routeView = computed((): 'OVER' | 'SCHD' | 'STAT' => {
   const view = route.params?.view ?? 'OVER';
@@ -151,12 +168,26 @@ const updateDaemonData = async () => {
   daemonPowers.value = pRes;
 }
 
-const reloadSchedules = async (done: () => void) => {
+const reloadSchedules = async (done: (() => void) | undefined = undefined) => {
   daemonSchedules.value = (await schedule.getAllSchedules(daemonId.value)) ?? []
-  done()
+  if (!!done) done()
 }
 
-const daemonIsOnline = computed(() => getDaemonStatus(daemonRef.value as Daemon) == "Online")
+const deleteSchedule = async () => {
+  alert.value = false
+  await schedule.delete(scheduleToDelete.value as string, daemonId.value)
+  await reloadSchedules()
+}
+
+const scheduleDeleteAlert = (scheduleId: string) => {
+  scheduleToDelete.value = scheduleId
+  alert.value = true
+}
+
+const resetAlert = () => {
+  scheduleToDelete.value = undefined
+  alertError.value = undefined
+}
 
 const actionLinks = computed(() => [
   {
@@ -167,7 +198,7 @@ const actionLinks = computed(() => [
       alertError.value = undefined
       shouldReset.value = true
       alert.value = true
-    }
+    },
   },
   {
     title: 'Delete Daemon',

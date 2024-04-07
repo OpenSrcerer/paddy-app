@@ -1,7 +1,13 @@
 <template>
 
   <div style="height: 100vh" class="row items-center justify-evenly">
+
+    <LoadingSpinner v-if="loggingIn">
+
+    </LoadingSpinner>
+
     <div
+      v-else
       id="container"
       @keydown.enter.prevent="onLogin"
     >
@@ -37,6 +43,7 @@ import { ref } from 'vue';
 import session from 'src/backend/session/SessionPaddyBackendClient';
 import { useRouter } from 'vue-router';
 import DialogComponent from 'components/DialogComponent.vue';
+import LoadingSpinner from 'components/LoadingSpinner.vue';
 
 const router = useRouter()
 
@@ -45,6 +52,7 @@ const passwordForm = ref()
 
 const alert = ref(false)
 const alertText = ref("")
+const loggingIn = ref(false)
 
 const onLogin = async () => {
   try {
@@ -52,9 +60,14 @@ const onLogin = async () => {
       throw new Error("Please enter both your username and password!")
     }
 
+    loggingIn.value = true
+
     await session.doLogin(emailOrUsernameForm.value, passwordForm.value)
     await router.replace("/home")
+
+    loggingIn.value = false
   } catch (ex: any) {
+    loggingIn.value = false
     alertText.value = ex.message
     alert.value = true
   }

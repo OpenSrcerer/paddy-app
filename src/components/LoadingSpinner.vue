@@ -67,7 +67,7 @@ const randomQuotes = [
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100vh;
+  height: 100dvh;
   margin: 0 auto;
   justify-content: center;
   text-align: center;

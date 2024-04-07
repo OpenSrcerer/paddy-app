@@ -1,24 +1,26 @@
 <template>
-  <q-page class="grid-container">
+  <q-page v-if="powers.length" class="grid-container">
     <div class="d-items-container">
-<!--      <div>-->
-<!--        <div class="horizontal">-->
-<!--          <q-btn @click="resetDaemon">Reset</q-btn>-->
-<!--          <q-btn @click="deleteDaemon">Delete</q-btn>-->
-<!--        </div>-->
-<!--      </div>-->
+
     </div>
 
     <div class="horizontal">
       <div id="power-chart"></div>
     </div>
   </q-page>
+
+  <NoXyzHere
+    v-else
+    title="No statistics yet for this daemon!"
+    caption="Make sure it is configured correctly."
+  />
 </template>
 
 <script setup lang="ts">
 import ApexCharts from 'apexcharts';
 import { onMounted, ref, watch } from 'vue';
 import { Power } from 'src/backend/power/dto/Power';
+import NoXyzHere from 'components/NoXyzHere.vue';
 
 interface OverViewProps {
   powers: Array<Power>

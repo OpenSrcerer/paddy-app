@@ -70,3 +70,20 @@ h1, h2, h3, h4, h5, h6, p, button, index-page, span,
   max-height: 2em;
   transition: all .25s ease-in-out
 }
+
+// ---- Custom Animations for loading ----
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-load {
+  animation: fadeIn 0.5s ease-in-out forwards;
+  opacity: 0; /* Initial opacity to ensure the element is invisible before animation */
+}

@@ -3,7 +3,7 @@
     <h4><b>Welcome to the Paddy App!</b></h4>
     <h6>Log in or sign up to get started!</h6>
 
-    <q-img src="~assets/webp/clyde_wave.webp"></q-img>
+    <q-img src="~assets/webp/doggo_heya.webp"></q-img>
 
     <div id="container">
       <q-btn push to="login">Login</q-btn>

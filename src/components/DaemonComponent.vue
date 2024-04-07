@@ -17,7 +17,7 @@ import { Daemon, getBadgeColor, getDaemonStatus } from 'src/backend/daemon/dto/D
 
 export interface DaemonComponentProps {
   daemon: Daemon,
-  dense: boolean
+  dense: boolean,
 }
 const props = defineProps<DaemonComponentProps>();
 </script>

@@ -15,7 +15,7 @@
         color="ghostwhite"
         icon="autorenew"
       >
-        <div class="daemon-container wrap"
+        <div class="daemon-container wrap fade-in-load"
              v-for="daemon in daemons" :key="daemon.id"
              @click="onDaemonClick(daemon.id)"
         >

@@ -21,7 +21,7 @@
       <h4 v-else>
         {{ new Date(schedule.single * 1000).toLocaleString() }}
       </h4>
-      <h5>Timezone: {{ schedule.timezone }}</h5>
+      <h5>Timezone: <span style="font-weight: 200">{{ schedule.timezone }}</span></h5>
     </div>
   </div>
 </template>
