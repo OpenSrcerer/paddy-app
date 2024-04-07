@@ -1,9 +1,9 @@
 <template>
 
-  <q-scroll-area class="column" id="schedule-scroll">
+  <q-scroll-area id="container">
     <q-pull-to-refresh
       v-if="schedules.length"
-      id="schedule-puller"
+      id="scroll-container"
       @refresh="onRefresh"
       color="ghostwhite"
       icon="autorenew"
@@ -51,15 +51,17 @@ watchEffect(() => props.schedules)
   width: 50%;
 }
 
-#schedule-puller {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  height: 100vh;
+#scroll-container {
+  position: absolute;
+  height: 100%;
+  width: 100%;
 }
 
-#schedule-scroll {
-  height: 100vh;
+#container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
+  height: 100%;
 }
 </style>

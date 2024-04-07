@@ -58,7 +58,7 @@
       </div>
     </DialogComponent>
 
-    <div v-if="!!daemonRef">
+    <div style="height: 100%; width: 100%;" v-if="!!daemonRef">
       <OverView
         v-if="routeView == 'OVER'"
         :powers="daemonPowers"
