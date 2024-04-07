@@ -9,8 +9,8 @@
 
     <q-knob
       readonly
-      v-model="durationUntilSeconds"
-      :max="periodicIntervalTime"
+      v-model="secondsUntil"
+      :max="schedule.interval"
       track-color="grey-9"
       center-color="dark"
       show-value
@@ -40,7 +40,7 @@
         {{ cronstrue.toString(schedule.periodic as string, { verbose: false }) }}
       </h4>
       <h4 v-else>
-        {{ new Date(schedule.single * 1000).toLocaleString() }}
+        {{ new Date(schedule.nextExecution * 1000).toLocaleString() }}
       </h4>
       <h5>Timezone: <span style="font-weight: 200">{{ schedule.timezone }}</span></h5>
     </div>
@@ -52,7 +52,6 @@ import cronstrue from 'cronstrue';
 import { Schedule } from 'src/backend/schedule/dto/Schedule';
 import { computed } from 'vue';
 import moment from 'moment/moment';
-import parser from 'cron-parser';
 
 export interface DaemonComponentProps {
   schedule: Schedule,
@@ -66,57 +65,37 @@ const scheduleColor = computed(() => {
   else return '#9090ff'
 })
 
-const cronExpr = computed(() => {
-  if (props.schedule.periodic)
-    return parser.parseExpression(props.schedule.periodic as string)
-  else
-    return undefined
-})
-
-const durationUntil = computed(() => {
-  const nextExec = props.schedule.nextExecution ?? props.schedule.single
-  const unixSecondsUntil = nextExec - Date.now() / 1000;
-  return moment.duration(unixSecondsUntil, 'seconds')
-})
-
-const durationUntilSeconds = computed(() => durationUntil.value.asSeconds())
+const secondsUntil = computed(() => props.schedule.secondsUntil)
 
 const timeUntil = computed (() => {
-  const duration = durationUntil.value
+  const duration = moment.duration(secondsUntil.value, 'seconds')
 
   // Extract days, hours, minutes, and seconds from the duration
+  const years = duration.years()
+  const months = duration.months()
   const days = duration.days();
   const hours = duration.hours();
   const minutes = duration.minutes();
   const seconds = duration.seconds();
 
-  let formattedDuration;
-  if (days > 0) {
-    formattedDuration = `${days}d`;
+  if (years > 999) {
+    return "rly?"
+  } else if (years > 0) {
+    return `${years}y`;
+  } else if (months > 0) {
+    return `${months}m`;
+  } else if (days > 0) {
+    return `${days}d`;
   } else if (hours > 0) {
-    formattedDuration = `${hours}h ${minutes}m`;
+    return `${hours}h ${minutes}m`;
   } else if (minutes > 0) {
-    formattedDuration = `${minutes}m`;
+    return `${minutes}m`;
   } else {
-    formattedDuration = `${seconds}s`;
+    return `${seconds}s`;
   }
-
-  return formattedDuration;
 })
 
 const timeUntilSplit = computed(() => timeUntil.value.split(' '))
-
-const periodicIntervalTime = computed(() => {
-  const interval = cronExpr.value
-
-  if (interval) {
-    const nextDate = interval.next().toDate();
-    const nextNextDate = interval.next().toDate();
-    return (nextNextDate.getTime() - nextDate.getTime()) / 1000;
-  }
-
-  return undefined
-})
 </script>
 
 <style lang="scss">
