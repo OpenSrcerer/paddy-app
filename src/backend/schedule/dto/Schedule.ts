@@ -1,6 +1,6 @@
 export type Schedule = {
   id: number,
-  type: string,
+  type: ScheduleType,
   timezone: string,
   periodic?: string,
   nextExecution: number,
@@ -8,3 +8,5 @@ export type Schedule = {
   secondsUntil: number,
   interval: number
 }
+
+export type ScheduleType = 'ON' | 'OFF' | 'TOGGLE'

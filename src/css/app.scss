@@ -43,6 +43,19 @@ h1, h2, h3, h4, h5, h6, p, button,
   height: 100%;
 }
 
+.q-date--dark, .q-time--dark {
+  box-shadow: none;
+  border: none;
+}
+
+.q-date--portrait-standard .q-date__header {
+  background-color: transparent !important;
+}
+
+.q-time__header {
+  background: transparent !important;
+}
+
 // ---- Fonts ----
 @font-face {
   font-family: "Fira Sans";
@@ -69,6 +82,10 @@ h1, h2, h3, h4, h5, h6, p, button, index-page, span,
   border-radius: .5em;
   max-height: 2em;
   transition: all .25s ease-in-out
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
 
 // ---- Custom Animations for loading ----

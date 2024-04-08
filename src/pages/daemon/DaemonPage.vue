@@ -13,11 +13,13 @@
       />
     </template>
 
+    <ScheduleDialog v-model="scheduleAlert" @created="createSchedule"/>
+
     <DialogComponent
       v-model="alert"
 
       :icon="scheduleToDelete ? 'timer_off' : shouldReset ? 'build' : 'delete_forever'"
-      :title="scheduleToDelete ? 'Schedule Delete' : shouldReset ? 'Daemon Reset' : 'Daemon Delete'"
+      :title="scheduleToDelete ? 'Schedule Delete' : shouldReset ? 'Reset Daemon' : 'Delete Daemon'"
       close-button="Cancel"
       :persistent="false"
       :buttons="scheduleToDelete ? ['Remove'] : alertError ? [] : shouldReset ? ['reset'] : ['delete']"
@@ -98,19 +100,22 @@ import OverView from 'pages/daemon/views/OverView.vue';
 import ScheduleView from 'pages/daemon/views/ScheduleView.vue';
 import StatisticsView from 'pages/daemon/views/StatisticsView.vue';
 import DialogComponent from 'components/DialogComponent.vue';
+import ScheduleDialog from 'components/ScheduleDialog.vue';
 
-const route = useRoute();
-const router = useRouter()
+const route             = useRoute();
+const router            = useRouter()
 
-const alert = ref<boolean>(false)
-const alertError = ref<string | undefined>(undefined)
-const shouldReset = ref<boolean>(false)
-const scheduleToDelete = ref<string | undefined>(undefined)
+const alert             = ref<boolean>(false)
+const alertError        = ref<string | undefined>(undefined)
+const shouldReset       = ref<boolean>(false)
+const scheduleToDelete  = ref<string | undefined>(undefined)
 
-const daemonId = ref<string>(route.params.id as string)
-const daemonRef = ref<Daemon | undefined>(undefined)
-const daemonSchedules = ref<Array<Schedule>>([])
-const daemonPowers = ref<Array<Power>>([])
+const scheduleAlert     = ref<boolean>(false)
+
+const daemonId          = ref<string>(route.params.id as string)
+const daemonRef         = ref<Daemon | undefined>(undefined)
+const daemonSchedules   = ref<Array<Schedule>>([])
+const daemonPowers      = ref<Array<Power>>([])
 
 const pollIntervalId = setInterval(async () => await updateDaemonData(), 10000);
 
@@ -189,7 +194,43 @@ const resetAlert = () => {
   alertError.value = undefined
 }
 
+const createSchedule = async (newSchedule: Partial<Schedule>) => {
+  await schedule.createSchedule(newSchedule, daemonId.value)
+  await router.replace(`/daemon/${daemonId.value}/schedules`)
+  await reloadSchedules()
+}
+
+const navLinks = [
+  {
+    title: 'Daemon',
+    caption: 'Overview for your Daemon',
+    icon: 'space_dashboard',
+    route: `/daemon/${daemonId.value}`
+  },
+  {
+    title: 'Schedules',
+    caption: 'Manage your Daemon\'s schedules',
+    icon: 'alarm',
+    route: `/daemon/${daemonId.value}/schedules`
+  },
+  {
+    title: 'Insights',
+    caption: 'View your Daemon\'s statistics',
+    icon: 'insights',
+    route: `/daemon/${daemonId.value}/statistics`
+  }
+]
+
 const actionLinks = computed(() => [
+  {
+    title: 'Add Schedule',
+    caption: 'Toggle your Daemon on a schedule',
+    icon: 'alarm_add',
+    action: () => {
+      alertError.value = undefined
+      scheduleAlert.value = true
+    },
+  },
   {
     title: 'Reset Daemon',
     caption: 'Reset your Daemon to factory settings',
@@ -212,27 +253,6 @@ const actionLinks = computed(() => [
     }
   },
 ])
-
-const navLinks = [
-  {
-    title: 'Daemon',
-    caption: 'Overview for your Daemon',
-    icon: 'space_dashboard',
-    route: '/daemon/4'
-  },
-  {
-    title: 'Schedules',
-    caption: 'Toggle your Daemon on a schedule',
-    icon: 'timer',
-    route: '/daemon/4/schedules'
-  },
-  {
-    title: 'Insights',
-    caption: 'View your Daemon\'s statistics',
-    icon: 'insights',
-    route: '/daemon/4/statistics'
-  }
-]
 </script>
 
 <style scoped lang="scss">

@@ -16,7 +16,7 @@ class SchedulePaddyBackendClient extends AbstractBackendClient {
     return res.body ?? []
   }
 
-  async createSchedule(schedule: Schedule, daemonId: string): Promise<Schedule | undefined> {
+  async createSchedule(schedule: Partial<Schedule>, daemonId: string): Promise<Schedule | undefined> {
     const res = await this.request<Schedule>
       ("POST", ScheduleRoute.CREATE_SCHEDULE, { daemonId }, null, schedule)
     return res.body ?? undefined
