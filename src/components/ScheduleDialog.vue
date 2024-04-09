@@ -6,7 +6,7 @@
     icon="alarm_add"
     title="Add Schedule"
     close-button="Cancel"
-    :buttons="alertStep == 'DATE' ? ['finish'] : ['next']"
+    :buttons="alertStep == 'DATE' ? ['finish'] : needsCalendar && alertStep == 'TIME' ? ['finish'] : ['next']"
     @closed="clear"
 
     @next="alertStep = getStep"
@@ -14,14 +14,14 @@
   >
     <div class="schedule-selector" v-if="alertStep == 'INIT'">
       <div id="single-periodic-selector">
-        <p :class="schedulePeriodic ? 'gray' : ''">Single</p>
+        <p :class="schedulePeriodic ? 'gray' : ''">Once</p>
         <q-toggle
           :model-value="schedulePeriodic"
           :icon="schedulePeriodic ? 'replay' : 'done'"
           size="3rem"
           @click="schedulePeriodic = !schedulePeriodic"
         />
-        <p :class="schedulePeriodic ? '' : 'gray'">Periodic</p>
+        <p :class="schedulePeriodic ? '' : 'gray'">Repeat</p>
       </div>
 
       <q-option-group
@@ -35,6 +35,24 @@
       />
 
       <q-select
+        v-if="schedulePeriodic"
+        clearable
+        menu-anchor="bottom start"
+        style="width: 15rem"
+        input-debounce="0"
+        label="Repeat"
+        v-model="scheduleEvery"
+        popup-content-style="width: 1px;"
+        :options="[
+          { label: 'Every Minute', value: 'MINUTE' },
+          { label: 'Every Hour', value: 'HOUR' },
+          { label: 'Every Day', value: 'DAY' },
+          { label: 'Every Week', value: 'WEEK' },
+          { label: 'Every Month', value: 'MONTH' }]"
+        :dark="true"
+      />
+
+      <q-select
         use-input
         clearable
         menu-anchor="bottom start"
@@ -42,6 +60,7 @@
         input-debounce="0"
         label="Timezone"
         v-model="scheduleTzSearch"
+        popup-content-style="width: 1px;"
         :options="scheduleTimezones"
         :dark="true"
         @filter="findTimezone"
@@ -61,18 +80,8 @@
     </div>
 
     <div class="schedule-selector" v-else>
-      <q-option-group
-        v-if="schedulePeriodic"
-        v-model="scheduleEvery"
-        :options="[
-          { label: 'Every Day', value: 'DAY' },
-          { label: 'Every Week', value: 'WEEK' },
-          { label: 'Every Month', value: 'MONTH' }]"
-        color="primary"
-        inline
-      />
-      <q-date dark
-        :disable="schedulePeriodic && scheduleEvery == 'DAY'"
+      <q-date dark no-unset
+        :disable="schedulePeriodic && needsCalendar"
         v-model="scheduleDtModel"
         mask="YYYY-MM-DD HH:mm"
         color="purple"
@@ -90,7 +99,7 @@ import { Schedule, ScheduleType } from 'src/backend/schedule/dto/Schedule';
 import DialogComponent from 'components/DialogComponent.vue';
 
 type AlertStep = 'INIT' | 'DATE' | 'TIME'
-type ScheduleEvery = 'DAY' | 'WEEK' | 'MONTH'
+type ScheduleEvery = 'MINUTE' | 'HOUR' | 'DAY' | 'WEEK' | 'MONTH'
 
 const model = defineModel<boolean>();
 const emit = defineEmits(['created'])
@@ -103,7 +112,12 @@ const scheduleTzSearch  = ref<string>('')
 const scheduleTimezones = ref<Array<string>>(tz)
 const schedulePeriodic  = ref<boolean>(false)
 const scheduleDtModel   = ref<string | undefined>(undefined)
-const scheduleEvery     = ref<ScheduleEvery>('DAY')
+const scheduleEvery     = ref<{ label: string, value: ScheduleEvery }>({ label: 'Every Day', value: 'DAY' })
+
+const needsCalendar = computed(() =>
+  scheduleEvery.value.value == 'HOUR' ||
+  scheduleEvery.value.value == 'DAY' ||
+  scheduleEvery.value.value == 'MINUTE')
 
 const getStep = computed((): AlertStep => {
   if (scheduleDtModel.value)
@@ -135,7 +149,7 @@ const clear = () => {
   scheduleTimezones.value = tz
   schedulePeriodic.value = false
   scheduleDtModel.value = undefined
-  scheduleEvery.value = 'DAY'
+  scheduleEvery.value = { label: 'Every Day', value: 'DAY' }
 
   alertStep.value = getStep.value
 }
@@ -159,14 +173,18 @@ const dateToCron = (date: Date): string => {
   const minutes = date.getMinutes();
   const hours = date.getHours();
 
-  let variablePart = '* * *';
-  if (scheduleEvery.value == 'MONTH') {
-    variablePart = `${date.getDate()} * *`
-  } else if (scheduleEvery.value == 'WEEK') {
-    variablePart = `* * ${date.getDay()}`
+  switch (scheduleEvery.value.value) {
+    case 'MONTH':
+      return `${minutes} ${hours} ${date.getDate()} * *`
+    case 'WEEK':
+      return `${minutes} ${hours} * * ${date.getDay()}`
+    case 'DAY':
+      return `${minutes} ${hours} * * *`
+    case 'HOUR':
+      return `${minutes} * * * *`
+    case 'MINUTE':
+      return `*/${minutes} * * * *`
   }
-
-  return `${minutes} ${hours} ${variablePart}`;
 }
 </script>
 

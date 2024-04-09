@@ -42,7 +42,7 @@
       <h4 v-else>
         {{ new Date(schedule.nextExecution * 1000).toLocaleString() }}
       </h4>
-      <h5>Timezone: <span style="font-weight: 200">{{ schedule.timezone }}</span></h5>
+      <h5>Timezone: <span style="font-weight: 200">{{ schedule.timezone.replace("/", "-") }}</span></h5>
     </div>
   </div>
 </template>
@@ -109,6 +109,12 @@ h4, h5 {
   margin: 0;
 }
 
+@media(max-width: 375px) {
+  .schedule-content {
+    line-break: anywhere;
+  }
+}
+
 .schedule-remove-button {
   position: absolute;
   border: 2px #ff6464 solid;
@@ -157,7 +163,6 @@ h4, h5 {
   border: ghostwhite 1px solid;
   border-radius: 1rem;
   margin: 0 auto;
-  width: 50%;
   padding: 1rem 0;
 }
 </style>
