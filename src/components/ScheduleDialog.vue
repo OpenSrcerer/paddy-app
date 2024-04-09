@@ -6,7 +6,7 @@
     icon="alarm_add"
     title="Add Schedule"
     close-button="Cancel"
-    :buttons="alertStep == 'DATE' ? ['finish'] : needsCalendar && alertStep == 'TIME' ? ['finish'] : ['next']"
+    :buttons="dialogButtons"
     @closed="clear"
 
     @next="alertStep = getStep"
@@ -81,7 +81,6 @@
 
     <div class="schedule-selector" v-else>
       <q-date dark no-unset
-        :disable="schedulePeriodic && needsCalendar"
         v-model="scheduleDtModel"
         mask="YYYY-MM-DD HH:mm"
         color="purple"
@@ -114,10 +113,17 @@ const schedulePeriodic  = ref<boolean>(false)
 const scheduleDtModel   = ref<string | undefined>(undefined)
 const scheduleEvery     = ref<{ label: string, value: ScheduleEvery }>({ label: 'Every Day', value: 'DAY' })
 
-const needsCalendar = computed(() =>
-  scheduleEvery.value.value == 'HOUR' ||
+const skipCalendar = computed(() => schedulePeriodic.value &&
+  (scheduleEvery.value.value == 'HOUR' ||
   scheduleEvery.value.value == 'DAY' ||
-  scheduleEvery.value.value == 'MINUTE')
+  scheduleEvery.value.value == 'MINUTE'))
+
+const dialogButtons = computed(() => {
+  if (alertStep.value == 'DATE') return ['finish'];
+  if (alertStep.value == 'TIME' && skipCalendar.value) return ['finish'];
+
+  return ['next']
+})
 
 const getStep = computed((): AlertStep => {
   if (scheduleDtModel.value)
