@@ -1,7 +1,7 @@
 <template>
   <q-page v-if="powers.length" class="grid-container">
     <div class="d-items-container">
-
+      <h3>Total usage: {{ totalPower?.kwh?.toFixed(2) ?? "..." }}kWh</h3>
     </div>
 
     <div class="horizontal">
@@ -19,22 +19,28 @@
 <script setup lang="ts">
 import ApexCharts from 'apexcharts';
 import { onMounted, ref, watch } from 'vue';
-import { Power } from 'src/backend/power/dto/Power';
 import NoXyzHere from 'components/NoXyzHere.vue';
+import { AveragePower } from 'src/backend/stats/dto/AveragePower';
+import { TotalPower } from 'src/backend/stats/dto/TotalPower';
 
 interface OverViewProps {
-  powers: Array<Power>
+  powers: Array<AveragePower>
+  totalPower?: TotalPower
 }
 
-const props = withDefaults(defineProps<OverViewProps>(), { powers: () => [] })
+const props = withDefaults(defineProps<OverViewProps>(), {
+  powers: () => []
+})
 const chart = ref<ApexCharts>()
 
 onMounted(async () => await makeChart())
+
 watch(() => props.powers, async () => await makeChart())
 
 const makeChart = async () => {
   const options = {
     chart: {
+      width: '100%',
       type: 'line',
       toolbar: { show: false },
       height: '90%'
@@ -76,11 +82,11 @@ const loadChartData = async () => {
   await chart.value?.updateOptions({
     series: [{
       name: 'Power Draw (W)',
-      data: props.powers.map(p => p.w),
+      data: props.powers.map(p => p.averageW.toFixed(1)),
       color: '#aa0aaa'
     }],
     xaxis: {
-      categories: props.powers.map(p => new Date(p.timestamp * 1000)
+      categories: props.powers.map(p => new Date(p.temporal * 1000)
         .toLocaleTimeString('en-US', { hour12: false })),
       labels: {
         style: {
@@ -105,7 +111,7 @@ const loadChartData = async () => {
 </style>
 
 <style scoped lang="scss">
-h4, h5 {
+h3 {
   margin: 0;
 }
 
@@ -120,13 +126,12 @@ h4, h5 {
 }
 
 .d-items-container {
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-}
-
-.d-items-container > * {
-  flex: 1 1 auto;
+  justify-content: center;
+  text-align: center;
 }
 
 .grid-container {
@@ -158,7 +163,6 @@ h4, h5 {
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  padding: 0 1rem 0 1rem;
 }
 
 .name-chip-wrapper {
