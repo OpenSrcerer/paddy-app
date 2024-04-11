@@ -1,10 +1,22 @@
 body {
   background-color: $dark;
-  overflow-y: hidden;
+  overflow: hidden;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
 
 * {
   user-select: none;
+}
+
+.apexcharts-tooltip.apexcharts-theme-light,
+.apexcharts-tooltip-title,
+.apexcharts-xaxistooltip,
+.apexcharts-xaxistooltip-text {
+  background-color: $dark !important;
+  color: ghostwhite;
 }
 
 h1, h2, h3, h4, h5, h6, p, button,
@@ -17,6 +29,10 @@ h1, h2, h3, h4, h5, h6, p, button,
 .q-card {
   background-color: $dark;
   border: ghostwhite 1px solid;
+}
+
+.q-img {
+  color: ghostwhite;
 }
 
 // Fix q-toggle & q-radio backgrounds color
@@ -56,6 +72,11 @@ h1, h2, h3, h4, h5, h6, p, button,
   background: transparent !important;
 }
 
+.q-virtual-scroll__content {
+  border: 1px ghostwhite solid;
+  box-shadow: none;
+}
+
 // ---- Fonts ----
 @font-face {
   font-family: "Fira Sans";
@@ -82,10 +103,6 @@ h1, h2, h3, h4, h5, h6, p, button, index-page, span,
   border-radius: .5em;
   max-height: 2em;
   transition: all .25s ease-in-out
-}
-
-::-webkit-scrollbar {
-  display: none;
 }
 
 // ---- Custom Animations for loading ----

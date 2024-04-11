@@ -64,7 +64,6 @@
       <OverView
         v-if="routeView == 'OVER'"
         :powers="daemonPowers"
-        :total-power="daemonTotalPower"
       />
       <ScheduleView
         v-else-if="routeView == 'SCHD'"
@@ -74,7 +73,13 @@
         @delete="scheduleDeleteAlert"
         @close="resetAlert"
       />
-      <StatisticsView v-else-if="routeView == 'STAT'"/>
+      <StatisticsView
+        v-else-if="routeView == 'STAT'"
+        v-model="temporal"
+        :cumulative-usage="daemonTotalPower"
+        :average-usage="daemonAveragePwr"
+        :rolling-usage="daemonRollingPwr"
+      />
     </div>
 
     <div v-else class="column items-center justify-center">
@@ -85,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeMount, onUnmounted, ref } from 'vue';
+import { computed, onBeforeMount, onUnmounted, ref, watch } from 'vue';
 import daemon from 'src/backend/daemon/DaemonPaddyBackendClient';
 import { useRoute, useRouter } from 'vue-router';
 import { init, reset } from 'src/bluetooth/BleService';
@@ -100,30 +105,35 @@ import ScheduleView from 'pages/daemon/views/ScheduleView.vue';
 import StatisticsView from 'pages/daemon/views/StatisticsView.vue';
 import DialogComponent from 'components/DialogComponent.vue';
 import ScheduleDialog from 'components/ScheduleDialog.vue';
-import { AveragePower } from 'src/backend/stats/dto/AveragePower';
-import stats from 'src/backend/stats/StatsPaddyBackendClient';
-import { TotalPower } from 'src/backend/stats/dto/TotalPower';
+import { PowerStatistic } from 'src/backend/stats/dto/PowerStatistic';
+import stats, { PowerTemporal } from 'src/backend/stats/StatsPaddyBackendClient';
 
 const route             = useRoute();
 const router            = useRouter()
 
+const daemonId          = ref<string>(route.params.id as string)
+const daemonRef         = ref<Daemon | undefined>(undefined)
+
 const alert             = ref<boolean>(false)
 const alertError        = ref<string | undefined>(undefined)
 const shouldReset       = ref<boolean>(false)
-const scheduleToDelete  = ref<string | undefined>(undefined)
 
+const daemonSchedules   = ref<Array<Schedule>>([])
+const scheduleToDelete  = ref<string | undefined>(undefined)
 const scheduleAlert     = ref<boolean>(false)
 
-const daemonId          = ref<string>(route.params.id as string)
-const daemonRef         = ref<Daemon | undefined>(undefined)
-const daemonSchedules   = ref<Array<Schedule>>([])
-const daemonPowers      = ref<Array<AveragePower>>([])
-const daemonTotalPower  = ref<TotalPower | undefined>(undefined)
+const daemonPowers      = ref<Array<PowerStatistic>>([])
+const daemonRollingPwr  = ref<Array<PowerStatistic>>([])
+const daemonAveragePwr  = ref<Array<PowerStatistic>>([])
+const daemonTotalPower  = ref<PowerStatistic | undefined>(undefined)
+const temporal          = ref<PowerTemporal>('DAY')
 
 const pollIntervalId = setInterval(async () => await updateDaemonData(), 10000);
 
 onBeforeMount(async () => await updateDaemonData())
 onUnmounted(() => { clearInterval(pollIntervalId); });
+
+watch(() => temporal.value, async () => await reloadCharts())
 
 const daemonIsOnline = computed(() => getDaemonStatus(daemonRef.value as Daemon) == 'Online')
 const toggleButtonEvent = computed(() => getDaemonStatus(
@@ -168,16 +178,27 @@ const deleteResetDaemon = async () => {
 const updateDaemonData = async () => {
   const dRes = await daemon.getDaemon(daemonId.value)
   if (!dRes) { return; }
-  const sRes = (await schedule.getAllSchedules(daemonId.value)) ?? []
-  const pRes = (await stats.getAverageStatsPower(daemonId.value, {
-    temporal: 'MINUTE', limit: 10
-  })) ?? []
-  const tRes = (await stats.getTotalPower(daemonId.value))
 
   daemonRef.value = dRes;
-  daemonSchedules.value = sRes;
-  daemonPowers.value = pRes;
-  daemonTotalPower.value = tRes;
+  daemonSchedules.value = (await schedule.getAllSchedules(daemonId.value)) ?? [];
+  daemonPowers.value = (await stats.getAverageStatsPower(daemonId.value, {
+    temporal: 'MINUTE',
+    limit: 10
+  })) ?? [];
+  daemonTotalPower.value = (await stats.getTotalPower(daemonId.value));
+
+  await reloadCharts()
+}
+
+const reloadCharts = async () => {
+  daemonRollingPwr.value = (await stats.getRollingAveragePower(daemonId.value, {
+    temporal: temporal.value,
+    limit: 15
+  }))
+  daemonAveragePwr.value = (await stats.getAverageStatsPower(daemonId.value, {
+    temporal: temporal.value,
+    limit: 15
+  }))
 }
 
 const reloadSchedules = async (done: (() => void) | undefined = undefined) => {
@@ -222,7 +243,7 @@ const navLinks = [
   },
   {
     title: 'Insights',
-    caption: 'View your Daemon\'s statistics',
+    caption: 'View your Daemon\'s power statistics',
     icon: 'insights',
     route: `/daemon/${daemonId.value}/statistics`
   }

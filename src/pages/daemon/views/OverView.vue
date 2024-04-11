@@ -1,7 +1,7 @@
 <template>
   <q-page v-if="powers.length" class="grid-container">
     <div class="d-items-container">
-      <h3>Total usage: {{ totalPower?.kwh?.toFixed(2) ?? "..." }}kWh</h3>
+      <h4>Drawing {{ powers[powers.length - 1].statistic.toFixed(2) }}W</h4>
     </div>
 
     <div class="horizontal">
@@ -20,21 +20,18 @@
 import ApexCharts from 'apexcharts';
 import { onMounted, ref, watch } from 'vue';
 import NoXyzHere from 'components/NoXyzHere.vue';
-import { AveragePower } from 'src/backend/stats/dto/AveragePower';
-import { TotalPower } from 'src/backend/stats/dto/TotalPower';
+import { PowerStatistic } from 'src/backend/stats/dto/PowerStatistic';
 
 interface OverViewProps {
-  powers: Array<AveragePower>
-  totalPower?: TotalPower
+  powers: Array<PowerStatistic>
 }
-
 const props = withDefaults(defineProps<OverViewProps>(), {
   powers: () => []
 })
+
 const chart = ref<ApexCharts>()
 
 onMounted(async () => await makeChart())
-
 watch(() => props.powers, async () => await makeChart())
 
 const makeChart = async () => {
@@ -43,10 +40,19 @@ const makeChart = async () => {
       width: '100%',
       type: 'line',
       toolbar: { show: false },
-      height: '90%'
+      height: '100%'
     },
     title: {
-      text: 'Power Draw'
+      text: 'Power Draw - 10 Minutes',
+      floating: false,
+      offsetY: 30,
+      align: 'center',
+      style: {
+        fontSize: '1.5rem',
+        fontWeight: 'bold',
+        fontFamily: 'Fira Sans',
+        color: 'ghostwhite'
+      }
     },
     stroke: {
       curve: 'smooth'
@@ -60,15 +66,8 @@ const makeChart = async () => {
         }
       }
     },
-    // dataLabels: {
-    //   enabled: true,
-    //   style: {
-    //     colors: ['#ff0000'] // Red color
-    //   }
-    // },
     series: [],
     xaxis: {},
-    noData: { text: 'Loading...' },
   }
 
   const newChart = new ApexCharts(document.querySelector("#power-chart"), options);
@@ -81,8 +80,8 @@ const makeChart = async () => {
 const loadChartData = async () => {
   await chart.value?.updateOptions({
     series: [{
-      name: 'Power Draw (W)',
-      data: props.powers.map(p => p.averageW.toFixed(1)),
+      name: "Power Draw (W)",
+      data: props.powers.map(p => p.statistic.toFixed(1)),
       color: '#aa0aaa'
     }],
     xaxis: {
@@ -139,11 +138,6 @@ h3 {
   width: 100%;
 }
 
-.grid-container > div:nth-of-type(2) {
-  width: 100%;
-  border-top: ghostwhite 1px solid;
-  text-align: center;
-}
 
 .vertical {
   display: flex;

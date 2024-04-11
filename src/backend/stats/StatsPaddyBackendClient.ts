@@ -1,10 +1,9 @@
 import { AbstractBackendClient } from 'src/backend/AbstractBackendClient';
-import { TotalPower } from 'src/backend/stats/dto/TotalPower';
-import { AveragePower } from 'src/backend/stats/dto/AveragePower';
+import { PowerStatistic } from 'src/backend/stats/dto/PowerStatistic';
 import { StatsRoute } from 'src/backend/stats/StatsRoute';
 
 export type PowerTemporal =
-  'MINUTE' | 'HOUR' | 'DAY' | 'WEEK' |'FOUR_WEEKS' | 'QUARTER' | 'HALF_YEAR' | 'YEAR'
+  'MINUTE' | 'HOUR' | 'DAY' | 'WEEK' | 'MONTH' | 'QUARTER' | 'HALF_YEAR' | 'YEAR'
 
 class StatsPaddyBackendClient extends AbstractBackendClient {
 
@@ -16,12 +15,12 @@ class StatsPaddyBackendClient extends AbstractBackendClient {
       before?: number,
       after?: number
     } = {}
-  ): Promise<TotalPower | undefined> {
+  ): Promise<PowerStatistic | undefined> {
     const queryParams = Object.assign({},
       !opt.before ? null : { before: `${opt.before}` },
       !opt.after ? null : { after: `${opt.after}` });
 
-    const res = await this.request<TotalPower>(
+    const res = await this.request<PowerStatistic>(
       "GET", StatsRoute.TOTAL_POWER, { daemonId }, queryParams)
     return res.body ?? undefined
   }
@@ -34,15 +33,35 @@ class StatsPaddyBackendClient extends AbstractBackendClient {
       after?: number,
       limit?: number
     }
-  ): Promise<Array<AveragePower>> {
+  ): Promise<Array<PowerStatistic>> {
     const queryParams = Object.assign({},
       !opt.temporal ? null : { temporal: `${opt.temporal}` },
       !opt.before ? null : { before: `${opt.before}` },
       !opt.after ? null : { after: `${opt.after}` },
       !opt.limit ? null : { limit: `${opt.limit}` });
 
-    const res = await this.request<Array<AveragePower>>(
+    const res = await this.request<Array<PowerStatistic>>(
       "GET", StatsRoute.AVERAGE_POWER, { daemonId }, queryParams)
+    return res.body ?? []
+  }
+
+  async getRollingAveragePower(
+    daemonId: string,
+    opt: {
+      temporal?: PowerTemporal,
+      before?: number,
+      after?: number,
+      limit?: number
+    }
+  ): Promise<Array<PowerStatistic>> {
+    const queryParams = Object.assign({},
+      !opt.temporal ? null : { temporal: `${opt.temporal}` },
+      !opt.before ? null : { before: `${opt.before}` },
+      !opt.after ? null : { after: `${opt.after}` },
+      !opt.limit ? null : { limit: `${opt.limit}` });
+
+    const res = await this.request<Array<PowerStatistic>>(
+      "GET", StatsRoute.ROLLING_POWER, { daemonId }, queryParams)
     return res.body ?? []
   }
 }
