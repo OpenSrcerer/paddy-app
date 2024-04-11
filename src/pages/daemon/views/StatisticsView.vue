@@ -1,6 +1,9 @@
 <template>
 
-  <div id="statistics-viewport" style="height: 100%; width: 100%;">
+  <div
+    id="statistics-viewport"
+    :style="!init ? 'display: none' : undefined"
+  >
     <TemporalPicker
       v-model="model"
       class="picker"
@@ -23,6 +26,8 @@
 
     </div>
   </div>
+
+  <LoadingSpinner :style="init ? 'display: none' : undefined"/>
 </template>
 
 <script setup lang="ts">
@@ -31,6 +36,7 @@ import { PowerTemporal } from 'src/backend/stats/StatsPaddyBackendClient';
 import { PowerStatistic } from 'src/backend/stats/dto/PowerStatistic';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import ApexCharts from 'apexcharts';
+import LoadingSpinner from 'components/LoadingSpinner.vue';
 
 interface StatisticsViewProps {
   cumulativeUsage?: PowerStatistic,
@@ -55,7 +61,7 @@ onMounted(async () =>
       makeRollingChart(), makeAverageChart()
     ])
     init.value = true;
-  }, 1000)
+  }, 250)
 )
 onUnmounted(() => init.value = false)
 
@@ -234,6 +240,8 @@ h4 {
 }
 
 #statistics-viewport {
+  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
