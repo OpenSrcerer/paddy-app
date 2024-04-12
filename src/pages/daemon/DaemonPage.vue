@@ -63,6 +63,7 @@
     <div style="height: 100%; width: 100%;" v-if="!!daemonRef">
       <OverView
         v-if="routeView == 'OVER'"
+        :daemon="daemonRef"
         :powers="daemonPowers"
       />
       <ScheduleView

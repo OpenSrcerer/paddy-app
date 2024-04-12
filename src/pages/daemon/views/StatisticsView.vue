@@ -20,11 +20,13 @@
         <StatisticsChip
           :description="`Last ${toTitleCase(model)}'s Usage`"
           :value="`${rollingUsage[rollingUsage.length - 2]?.statistic?.toFixed(2) ?? 'N/A'} kWh`"
+          :trending="getTrend(rollingUsage)"
         />
 
         <StatisticsChip
           :description="`Avg. Power Last ${toTitleCase(model)}`"
-          :value="`${averageUsage[rollingUsage.length - 2]?.statistic?.toFixed(2) ?? 'N/A'} W`"
+          :value="`${averageUsage[averageUsage.length - 2]?.statistic?.toFixed(2) ?? 'N/A'} W`"
+          :trending="getTrend(averageUsage)"
         />
       </div>
 
@@ -265,6 +267,21 @@ const toTitleCase = (str: string) => {
       return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     }
   );
+}
+
+const getTrend = (stats: Array<PowerStatistic>) => {
+  // Need latest stats, the one before, and the history before that
+  // the eldest 2 are compared
+  if (stats.length < 3) return undefined;
+
+  const beforeCurrent = stats[stats.length - 1].statistic;
+  const beforex2Current = stats[stats.length - 2].statistic;
+
+  const delta = Math.round(beforeCurrent - beforex2Current);
+
+  if (delta > 0) return 'UP';
+  else if (delta == 0) return 'SAME';
+  else return 'DOWN';
 }
 </script>
 

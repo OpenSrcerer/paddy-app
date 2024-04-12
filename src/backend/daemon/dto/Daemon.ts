@@ -1,5 +1,7 @@
 import moment from 'moment/moment';
 
+const DAEMON_ONLINE_PERIOD_SECONDS = 100
+
 export type CreateDaemonResponse = Daemon & { jwt: string }
 
 export type Daemon = {
@@ -13,7 +15,7 @@ export type Daemon = {
 export function getDaemonStatus(daemon: Daemon) {
   if (!!daemon?.recovery) return 'Recovery'
   if (!daemon?.lastPing) return 'Unknown'
-  if ((Date.now() / 1000) - daemon.lastPing < 60) return 'Online'
+  if ((Date.now() / 1000) - daemon.lastPing < DAEMON_ONLINE_PERIOD_SECONDS) return 'Online'
   return `${moment(daemon.lastPing * 1000).fromNow()}`
 }
 

@@ -1,9 +1,22 @@
 <template>
   <q-page v-if="powers.length" class="container">
 
-
     <div class="d-items-container">
-      <h2>Your device is drawing {{ powers[powers.length - 1].statistic.toFixed(2) }}W</h2>
+      <StatisticsChip
+        description="Wi-Fi Strength"
+        :value="getDaemonStatus(daemon) == 'Online' ? `${!!getPercentValueFromRssi(daemon.lastRssi) ?
+          getPercentValueFromRssi(daemon.lastRssi) + '%' : 'N/A' }` : 'N/A'">
+        <WifiStrength
+          id="strength"
+          size="4rem"
+          :rssi="getDaemonStatus(daemon) == 'Online' ? daemon.lastRssi : undefined"
+        />
+      </StatisticsChip>
+
+      <StatisticsChip
+        description="Current Power Draw"
+        :value="powers[powers.length - 1].statistic.toFixed(2) + ' W'"
+      />
     </div>
 
     <div id="power-chart"></div>
@@ -21,8 +34,13 @@ import ApexCharts from 'apexcharts';
 import { onMounted, ref, watch } from 'vue';
 import NoXyzHere from 'components/NoXyzHere.vue';
 import { PowerStatistic } from 'src/backend/stats/dto/PowerStatistic';
+import WifiStrength from 'components/WifiStrength.vue';
+import { Daemon, getDaemonStatus } from 'src/backend/daemon/dto/Daemon';
+import StatisticsChip from 'components/StatisticsChip.vue';
+import { getPercentValueFromRssi } from 'src/utils/RssiUtils';
 
 interface OverViewProps {
+  daemon: Daemon,
   powers: Array<PowerStatistic>
 }
 const props = withDefaults(defineProps<OverViewProps>(), {
@@ -31,7 +49,7 @@ const props = withDefaults(defineProps<OverViewProps>(), {
 
 const chart = ref<ApexCharts>()
 
-onMounted(async () => setTimeout(async () => await makeChart(), 250))
+onMounted(async () => setTimeout(async () => await makeChart(), 500))
 watch(() => props.powers, async () => await makeChart())
 
 const makeChart = async () => {
@@ -113,6 +131,7 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  gap: 2rem;
   justify-content: center;
   text-align: center;
 }
@@ -152,5 +171,9 @@ h2 {
 
 .name-chip-wrapper {
   flex-wrap: nowrap !important;
+}
+
+.statistics-chip {
+  min-height: 7.5rem;
 }
 </style>
