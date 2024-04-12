@@ -9,9 +9,17 @@
 
     <div class="row items-center">
       <h4 v-if="value" style="font-weight: bold">{{ value }}</h4>
-      <h4 style="color: #ff4e4e" v-if="trending === 'UP'">🡅</h4>
+      <q-icon
+        v-if="trending === 'UP'"
+        style="color: #ff4e4e;font-size: 2.5rem"
+        name="arrow_upward"
+      />
       <h4 style="color: #8d8d8d" v-else-if="trending === 'SAME'">━</h4>
-      <h4 style="color: #b0ff61" v-else-if="trending === 'DOWN'">🡇</h4>
+      <q-icon
+        v-if="trending === 'DOWN'"
+        style="color: #b0ff61; font-size: 2.5rem"
+        name="arrow_downward"
+      />
       <slot/>
     </div>
   </div>
@@ -35,6 +43,11 @@ h4:first-of-type {
 }
 
 h4 {
+  margin: 0;
+  padding: 1rem 1rem 1rem 0;
+}
+
+.q-icon {
   margin: 0;
   padding: 1rem 1rem 1rem 0;
 }
