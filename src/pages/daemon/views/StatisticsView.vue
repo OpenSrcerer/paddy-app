@@ -274,8 +274,8 @@ const getTrend = (stats: Array<PowerStatistic>) => {
   // the eldest 2 are compared
   if (stats.length < 3) return undefined;
 
-  const beforeCurrent = stats[stats.length - 1].statistic;
-  const beforex2Current = stats[stats.length - 2].statistic;
+  const beforeCurrent = stats[stats.length - 2].statistic;
+  const beforex2Current = stats[stats.length - 3].statistic;
 
   const delta = Math.round(beforeCurrent - beforex2Current);
 
