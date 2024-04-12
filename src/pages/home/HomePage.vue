@@ -120,7 +120,7 @@ import MainLayout from 'layouts/MainLayout.vue';
 
 const router = useRouter()
 const store = useSetupStore()
-const daemons = ref<Array<Daemon> | undefined>(undefined)
+const daemons             = ref<Array<Daemon> | undefined>(undefined)
 
 const alert               = ref<boolean>(false)
 const alertPersistent     = ref<boolean>(false)

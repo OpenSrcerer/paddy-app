@@ -6,6 +6,7 @@ export type Daemon = {
   id: string,
   on: boolean
   recovery: boolean,
+  lastRssi: number,
   lastPing: number
 }
 

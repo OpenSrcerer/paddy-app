@@ -11,6 +11,23 @@
 
     <div id="dashboard-container" class="fade-in-load">
 
+      <div class="stats-container">
+        <StatisticsChip
+          description="All-Time Usage"
+          :value="`${cumulativeUsage?.statistic?.toFixed(2) ?? 'N/A'} kWh`"
+        />
+
+        <StatisticsChip
+          :description="`Last ${toTitleCase(model)}'s Usage`"
+          :value="`${rollingUsage[rollingUsage.length - 2]?.statistic?.toFixed(2) ?? 'N/A'} kWh`"
+        />
+
+        <StatisticsChip
+          :description="`Avg. Power Last ${toTitleCase(model)}`"
+          :value="`${averageUsage[rollingUsage.length - 2]?.statistic?.toFixed(2) ?? 'N/A'} W`"
+        />
+      </div>
+
       <div id="charts-vertical-container">
         <div class="chart-container">
           <div id="average-chart"></div>
@@ -18,10 +35,6 @@
         <div class="chart-container">
           <div id="rolling-chart"></div>
         </div>
-      </div>
-
-      <div class="stats-container">
-        <h4>Total Cumulative Usage: {{ cumulativeUsage?.statistic?.toFixed(2) ?? "..." }}kWh</h4>
       </div>
 
     </div>
@@ -37,6 +50,7 @@ import { PowerStatistic } from 'src/backend/stats/dto/PowerStatistic';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import ApexCharts from 'apexcharts';
 import LoadingSpinner from 'components/LoadingSpinner.vue';
+import StatisticsChip from 'components/StatisticsChip.vue';
 
 interface StatisticsViewProps {
   cumulativeUsage?: PowerStatistic,
@@ -76,6 +90,18 @@ const makeRollingChart = async () => {
       type: 'area',
       toolbar: { show: false },
       height: '100%'
+    },
+    title: {
+      text: `Energy Usage (kWh): ${toTitleCase(model.value)}`,
+      floating: false,
+      offsetY: 40,
+      align: 'center',
+      style: {
+        fontSize: '1.5rem',
+        fontWeight: '300',
+        fontFamily: 'Fira Sans',
+        color: 'ghostwhite'
+      }
     },
     stroke: {
       curve: 'smooth'
@@ -145,6 +171,18 @@ const makeAverageChart = async () => {
       toolbar: { show: false },
       height: '100%'
     },
+    title: {
+      text: `Average Power Draw (W): ${toTitleCase(model.value)}`,
+      floating: false,
+      offsetY: 40,
+      align: 'center',
+      style: {
+        fontSize: '1.5rem',
+        fontWeight: '300',
+        fontFamily: 'Fira Sans',
+        color: 'ghostwhite'
+      }
+    },
     stroke: {
       curve: 'smooth'
     },
@@ -172,7 +210,7 @@ const loadAverageChartData = async () => {
   await averageChart.value?.updateOptions({
     series: [
       {
-        name: "Average Usage (W)",
+        name: "Average Draw (W)",
         data: props.averageUsage.map(p => p.statistic.toFixed(5)),
         color: '#aa0aaa'
       }
@@ -264,7 +302,7 @@ h4 {
 
 #charts-vertical-container {
   height: 80%;
-  min-width: 20rem;
+  min-width: 100%;
   flex-grow: 1;
 }
 
@@ -280,10 +318,13 @@ h4 {
 }
 
 .stats-container {
-  height: auto;
-  display: inline;
-  flex-direction: column;
+  margin: 2rem 1rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
   align-items: center;
+  gap: 2rem;
   flex-grow: 1;
 }
 </style>

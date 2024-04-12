@@ -1,12 +1,12 @@
 <template>
-  <q-page v-if="powers.length" class="grid-container">
+  <q-page v-if="powers.length" class="container">
+
+
     <div class="d-items-container">
-      <h4>Drawing {{ powers[powers.length - 1].statistic.toFixed(2) }}W</h4>
+      <h2>Your device is drawing {{ powers[powers.length - 1].statistic.toFixed(2) }}W</h2>
     </div>
 
-    <div class="horizontal">
-      <div id="power-chart"></div>
-    </div>
+    <div id="power-chart"></div>
   </q-page>
 
   <NoXyzHere
@@ -31,7 +31,7 @@ const props = withDefaults(defineProps<OverViewProps>(), {
 
 const chart = ref<ApexCharts>()
 
-onMounted(async () => await makeChart())
+onMounted(async () => setTimeout(async () => await makeChart(), 250))
 watch(() => props.powers, async () => await makeChart())
 
 const makeChart = async () => {
@@ -40,19 +40,7 @@ const makeChart = async () => {
       width: '100%',
       type: 'line',
       toolbar: { show: false },
-      height: '100%'
-    },
-    title: {
-      text: 'Power Draw - 10 Minutes',
-      floating: false,
-      offsetY: 30,
-      align: 'center',
-      style: {
-        fontSize: '1.5rem',
-        fontWeight: 'bold',
-        fontFamily: 'Fira Sans',
-        color: 'ghostwhite'
-      }
+      height: '50%'
     },
     stroke: {
       curve: 'smooth'
@@ -110,12 +98,8 @@ const loadChartData = async () => {
 </style>
 
 <style scoped lang="scss">
-h3 {
+h2 {
   margin: 0;
-}
-
-#power-chart {
-  min-width: 80%;
 }
 
 #schedules {
@@ -133,11 +117,18 @@ h3 {
   text-align: center;
 }
 
-.grid-container {
-  display: grid;
-  width: 100%;
+#power-chart {
+  min-width: 80%;
 }
 
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+}
 
 .vertical {
   display: flex;

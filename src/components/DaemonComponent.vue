@@ -30,6 +30,7 @@ const props = defineProps<DaemonComponentProps>();
 
 .non-dense {
   margin: 1rem;
+  text-align: center;
 }
 
 .name-chip-wrapper {
@@ -37,5 +38,6 @@ const props = defineProps<DaemonComponentProps>();
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 </style>
