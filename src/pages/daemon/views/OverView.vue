@@ -110,7 +110,7 @@ const loadChartData = async () => {
         .toLocaleTimeString([], { hour12: false })),
       labels: {
         style: {
-          colors: props.powers.map(_ => 'ghostwhite')
+          colors: props.powers.length > 1 ? props.powers.map(_ => 'ghostwhite') : 'ghostwhite'
         }
       }
     },
@@ -118,7 +118,7 @@ const loadChartData = async () => {
       labels: {
         maxTicks: 5,
         style: {
-          colors: props.powers.map(_ => 'ghostwhite')
+          colors: props.powers.length > 1 ? props.powers.map(_ => 'ghostwhite') : 'ghostwhite'
         }
       }
     }

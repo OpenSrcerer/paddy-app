@@ -150,7 +150,7 @@ const loadRollingChartData = async () => {
       categories: getChartDateFormatted(props.rollingUsage),
       labels: {
         style: {
-          colors: props.rollingUsage.map(_ => 'ghostwhite')
+          colors: props.rollingUsage.length > 1 ? props.rollingUsage.map(_ => 'ghostwhite') : 'ghostwhite'
         }
       }
     },
@@ -159,7 +159,7 @@ const loadRollingChartData = async () => {
       labels: {
         maxTicks: 5,
         style: {
-          colors: props.rollingUsage.map(_ => 'ghostwhite')
+          colors: props.rollingUsage.length > 1 ? props.rollingUsage.map(_ => 'ghostwhite') : 'ghostwhite'
         }
       }
     }
@@ -232,7 +232,7 @@ const loadAverageChartData = async () => {
       categories: getChartDateFormatted(props.rollingUsage),
       labels: {
         style: {
-          colors: props.averageUsage.map(_ => 'ghostwhite')
+          colors: props.averageUsage.length > 1 ? props.averageUsage.map(_ => 'ghostwhite') : 'ghostwhite'
         }
       }
     },
@@ -241,7 +241,7 @@ const loadAverageChartData = async () => {
       labels: {
         maxTicks: 5,
         style: {
-          colors: props.averageUsage.map(_ => 'ghostwhite')
+          colors: props.averageUsage.length > 1 ? props.averageUsage.map(_ => 'ghostwhite') : 'ghostwhite'
         }
       }
     }
