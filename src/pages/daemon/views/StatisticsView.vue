@@ -255,14 +255,14 @@ const getChartDateFormatted = (usage: Array<PowerStatistic>): Array<string> => {
     .getFullYear().toString()]
 
   if (usage.length == 1) return [new Date(usage[0].temporal * 1000)
-    .toLocaleDateString('en-US', { month: '2-digit', year: 'numeric' })]
+    .toLocaleDateString([], { month: '2-digit', year: 'numeric' })]
 
   if (usage[1].temporal - usage[0].temporal > 3600)
     return props.rollingUsage.map(p => new Date(p.temporal * 1000)
-      .toLocaleDateString('en-US'));
+      .toLocaleDateString([]));
 
   return props.rollingUsage.map(p => new Date(p.temporal * 1000)
-    .toLocaleTimeString('en-US', { hour12: false }));
+    .toLocaleTimeString([], { hour12: false }));
 }
 
 const toTitleCase = (str: string) => {

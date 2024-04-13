@@ -107,7 +107,7 @@ const loadChartData = async () => {
     }],
     xaxis: {
       categories: props.powers.map(p => new Date(p.temporal * 1000)
-        .toLocaleTimeString('en-US', { hour12: false })),
+        .toLocaleTimeString([], { hour12: false })),
       labels: {
         style: {
           colors: props.powers.map(_ => 'ghostwhite')

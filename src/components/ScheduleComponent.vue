@@ -37,10 +37,10 @@
 
     <div class="schedule-content">
       <h4 v-if="schedule.periodic">
-        {{ cronstrue.toString(schedule.periodic as string, { verbose: false }) }}
+        {{ cronstrue.toString(schedule.periodic as string, { verbose: false, use24HourTimeFormat: true }) }}
       </h4>
       <h4 v-else>
-        {{ new Date(schedule.nextExecution * 1000).toLocaleString() }}
+        {{ new Date(schedule.nextExecution * 1000).toLocaleString([], { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }) }}
       </h4>
       <h5>Timezone: <span style="font-weight: 200">{{ schedule.timezone.replace("/", "-") }}</span></h5>
     </div>
