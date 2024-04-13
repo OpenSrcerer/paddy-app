@@ -149,6 +149,7 @@ h2 {
   gap: 2rem;
   justify-content: center;
   text-align: center;
+  padding: 0 1rem;
 }
 
 #power-chart {

@@ -1,7 +1,18 @@
 <template>
-  <div class="name-chip-wrapper">
-    <h4 v-if="!dense" :class="dense ? 'dense' : 'non-dense'">Daemon {{ daemon.id }}</h4>
-    <h5 v-else :class="dense ? 'dense' : 'non-dense'">Daemon {{ daemon.id }}</h5>
+  <div
+    class="name-chip-wrapper"
+    v-touch-hold.mouse="onTouchHold"
+  >
+    <input
+      v-if="switchNameMode"
+      :class="(!newName || newName.length < 2 || newName.length > 15) ? 'input-form red' : 'input-form'"
+      class="input-form"
+      v-model="newName"
+      :placeholder="`${daemon.name}`"
+    >
+
+    <h4 v-if="!dense && !switchNameMode" :class="dense ? 'dense' : 'non-dense'">{{ daemon.name }}</h4>
+    <h5 v-else-if="!switchNameMode" :class="dense ? 'dense' : 'non-dense'">{{ daemon.name }}</h5>
 
     <q-chip
       :size="dense ? '0.7rem' : '1rem'" outline
@@ -20,6 +31,15 @@ export interface DaemonComponentProps {
   dense: boolean,
 }
 const props = defineProps<DaemonComponentProps>();
+
+const switchNameMode = defineModel<boolean>('mode' ,{ required: false });
+const newName = defineModel<string>('name' ,{ required: false });
+
+const onTouchHold = () => {
+  if (props.dense) {
+    switchNameMode.value = true;
+  }
+}
 </script>
 
 <style scoped lang="scss">
@@ -33,6 +53,12 @@ const props = defineProps<DaemonComponentProps>();
   text-align: center;
 }
 
+@media (max-aspect-ratio: 1 / 2) {
+  h5.dense {
+    font-size: 1rem;
+  }
+}
+
 .name-chip-wrapper {
   display: flex;
   flex-wrap: wrap;
@@ -40,4 +66,19 @@ const props = defineProps<DaemonComponentProps>();
   justify-content: center;
   position: relative;
 }
+
+.input-form {
+  margin: 0 .75rem 0 0;
+  max-width: 10rem;
+  font-size: 1rem;
+}
+
+.red {
+  border: 1px red solid;
+}
+
+.red:focus-visible, .red:focus {
+  outline: 1px red solid;
+}
+
 </style>

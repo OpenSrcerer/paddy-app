@@ -21,6 +21,11 @@ class DaemonPaddyBackendClient extends AbstractBackendClient {
     return res.body ?? undefined
   }
 
+  async patchDaemon(id: string, name: string): Promise<Daemon | undefined> {
+    const res = await this.request<Daemon>("PATCH", DaemonRoute.UPDATE_DAEMON, { id }, null, { name })
+    return res.body ?? undefined
+  }
+
   async toggle(id: string) {
     await this.request("PATCH", DaemonRoute.TOGGLE_DAEMON, { id })
   }

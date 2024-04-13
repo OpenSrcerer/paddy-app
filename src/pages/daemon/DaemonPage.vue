@@ -1,8 +1,19 @@
 <template>
 
-  <MainLayout :navLinks="navLinks" :actionLinks="actionLinks">
+  <MainLayout
+    :navLinks="navLinks"
+    :actionLinks="actionLinks"
+    @keydown.enter="onNewDaemonName"
+    @keydown.esc="onNewNameUnfocus"
+  >
     <template #toolbar>
-      <DaemonComponent v-if="!!daemonRef" :dense="true" :daemon="daemonRef"/>
+      <DaemonComponent
+        v-if="!!daemonRef"
+        v-model:mode="newNameMode"
+        v-model:name="newName"
+        :dense="true"
+        :daemon="daemonRef"
+      />
       <q-toggle
         v-if="!!daemonRef"
         :model-value="daemonRef.on"
@@ -60,7 +71,11 @@
       </div>
     </DialogComponent>
 
-    <div style="height: 100%; width: 100%;" v-if="!!daemonRef">
+    <div
+      style="height: 100%; width: 100%;"
+      v-if="!!daemonRef"
+      @click="onNewNameUnfocus"
+    >
       <OverView
         v-if="routeView == 'OVER'"
         :daemon="daemonRef"
@@ -128,6 +143,9 @@ const daemonRollingPwr  = ref<Array<PowerStatistic>>([])
 const daemonAveragePwr  = ref<Array<PowerStatistic>>([])
 const daemonTotalPower  = ref<PowerStatistic | undefined>(undefined)
 const temporal          = ref<PowerTemporal>('DAY')
+
+const newNameMode    = ref<boolean>(false)
+const newName        = ref<string>('')
 
 const pollIntervalId = setInterval(async () => await updateDaemonData(), 10000);
 
@@ -227,6 +245,23 @@ const createSchedule = async (newSchedule: Partial<Schedule>) => {
   await schedule.createSchedule(newSchedule, daemonId.value)
   await router.replace(`/daemon/${daemonId.value}/schedules`)
   await reloadSchedules()
+}
+
+const onNewDaemonName = async () => {
+  if (!newName.value || newName.value.length < 2 || newName.value.length > 15) return;
+
+  newNameMode.value = false;
+
+  const newDaemon = await daemon.patchDaemon(daemonId.value, newName.value);
+  if (!!newDaemon)
+    daemonRef.value = newDaemon;
+
+  onNewNameUnfocus()
+}
+
+const onNewNameUnfocus = () => {
+  newNameMode.value = false;
+  newName.value = '';
 }
 
 const navLinks = [

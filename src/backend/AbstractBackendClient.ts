@@ -50,7 +50,7 @@ export abstract class AbstractBackendClient {
       const res = await axios.request(requestConfig)
 
       console.log(
-        `[BACKEND] Response /${path}\n---------------------------------------\nCode:`,
+        `[BACKEND] Response ${verb}@/${path}\n---------------------------------------\nCode:`,
         `${res?.status}\nHeaders:`,
         !!res?.headers ? `${JSON.stringify(res?.headers)}\nBody:` : "<empty>\nBody:",
         !!res?.data ? JSON.stringify(res?.data) : "<empty>")

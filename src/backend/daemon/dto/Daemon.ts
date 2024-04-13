@@ -6,6 +6,7 @@ export type CreateDaemonResponse = Daemon & { jwt: string }
 
 export type Daemon = {
   id: string,
+  name: string,
   on: boolean
   recovery: boolean,
   lastRssi: number,
