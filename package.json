@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@capacitor-community/bluetooth-le": "^3.1.2",
+    "@capacitor/ios": "^5.7.4",
     "@quasar/extras": "^1.16.4",
     "apexcharts": "^3.48.0",
     "axios": "^1.6.7",
