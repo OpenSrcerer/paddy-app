@@ -87,6 +87,9 @@ watch(() => props.averageUsage, async () => await makeAverageChart())
 const makeRollingChart = async () => {
   const options = {
     chart: {
+      zoom: {
+        enabled: false,
+      },
       id: 'rolling-chart',
       width: '100%',
       type: 'area',
@@ -130,7 +133,6 @@ const makeRollingChart = async () => {
 
 const loadRollingChartData = async () => {
   await rollingChart.value?.updateOptions({
-    chart: { group: 'pwr' },
     series: [
       {
         name: "Usage (kWh)",
@@ -167,6 +169,9 @@ const loadRollingChartData = async () => {
 const makeAverageChart = async () => {
   const options = {
     chart: {
+      zoom: {
+        enabled: false,
+      },
       id: 'average-chart',
       width: '100%',
       type: 'line',

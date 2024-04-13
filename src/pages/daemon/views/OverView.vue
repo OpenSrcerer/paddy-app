@@ -14,7 +14,7 @@
       </StatisticsChip>
 
       <StatisticsChip
-        description="Current Power Draw"
+        description="Power Draw"
         :value="powers[powers.length - 1].statistic.toFixed(2) + ' W'"
       />
     </div>
@@ -55,10 +55,25 @@ watch(() => props.powers, async () => await makeChart())
 const makeChart = async () => {
   const options = {
     chart: {
+      zoom: {
+        enabled: false,
+      },
       width: '100%',
       type: 'line',
       toolbar: { show: false },
       height: '50%'
+    },
+    title: {
+      text: `Instantaneous Power Draw (W)`,
+      floating: false,
+      offsetY: 40,
+      align: 'center',
+      style: {
+        fontSize: '1.5rem',
+        fontWeight: '300',
+        fontFamily: 'Fira Sans',
+        color: 'ghostwhite'
+      }
     },
     stroke: {
       curve: 'smooth'
