@@ -60,7 +60,6 @@
         input-debounce="0"
         label="Timezone"
         v-model="scheduleTzSearch"
-        popup-content-style="width: 1px;"
         :options="scheduleTimezones"
         :dark="true"
         @filter="findTimezone"
