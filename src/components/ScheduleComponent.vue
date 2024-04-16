@@ -100,6 +100,7 @@ const timeUntilSplit = computed(() => timeUntil.value.split(' '))
 
 <style lang="scss">
 .schedule-remove-button .q-icon {
+  transition: all 100ms ease-in-out;
   color: #ff6464;
 }
 </style>
@@ -121,6 +122,11 @@ h4, h5 {
   top: -.75rem;
   right: -.75rem;
   background-color: $dark !important;
+  transition: all 100ms ease-in-out;
+}
+
+.schedule-remove-button:hover {
+  top: -1rem;
 }
 
 .q-badge {

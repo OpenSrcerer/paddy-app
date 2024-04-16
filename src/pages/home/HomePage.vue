@@ -349,6 +349,15 @@ const actionLinks = [{
   border-radius: 1rem;
   width: 100%;
   cursor: pointer;
+  transition: all 100ms ease-in-out;
+}
+
+.daemon-container:hover {
+  background-color: #313131;
+}
+
+.daemon-container:active {
+  background-color: #656565;
 }
 
 @media (max-width: 1180px) {
