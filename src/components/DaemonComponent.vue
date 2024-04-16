@@ -53,6 +53,12 @@ const onTouchHold = () => {
   text-align: center;
 }
 
+@media (max-aspect-ratio: 3 / 4) {
+  h4.non-dense {
+    line-break: anywhere;
+  }
+}
+
 @media (max-aspect-ratio: 1 / 2) {
   h5.dense {
     font-size: 1rem;
