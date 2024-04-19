@@ -118,6 +118,7 @@ const skipCalendar = computed(() => schedulePeriodic.value &&
   scheduleEvery.value.value == 'MINUTE'))
 
 const dialogButtons = computed(() => {
+  if (alertStep.value == 'INIT' && scheduleEvery.value.value == 'MINUTE') return ['finish'];
   if (alertStep.value == 'DATE') return ['finish'];
   if (alertStep.value == 'TIME' && skipCalendar.value) return ['finish'];
 
@@ -175,6 +176,13 @@ const finish = () => {
 }
 
 const dateToCron = (date: Date): string => {
+  if (isNaN(date.getMinutes()) && isNaN(date.getHours())) {
+    if (scheduleEvery.value.value == 'MINUTE')
+      return '* * * * *'
+    else
+      return '0 * * * *'
+  }
+
   const minutes = date.getMinutes();
   const hours = date.getHours();
 
