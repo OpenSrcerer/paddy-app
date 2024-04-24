@@ -48,8 +48,11 @@ export async function disconnect(deviceId: string | undefined) {
 }
 
 export async function reset(device: DaemonDevice) {
-  await writeToChar(device.daemon.deviceId, RESET_UUID, "x");
-  await disconnect(device.daemon.deviceId)
+  try {
+    await writeToChar(device.daemon.deviceId, RESET_UUID, "x");
+  } catch (e) {
+    await disconnect(device.daemon.deviceId)
+  }
 }
 
 async function getDeviceId(device: BleDevice): Promise<string> {

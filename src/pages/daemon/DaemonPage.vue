@@ -299,7 +299,7 @@ const actionLinks = computed(() => [
     title: 'Reset Daemon',
     caption: 'Reset your Daemon to factory settings',
     icon: 'build',
-    disable: daemonRef.value?.recovery,
+    // disable: daemonRef.value?.recovery,
     action: () => {
       alertError.value = undefined
       shouldReset.value = true
@@ -311,7 +311,7 @@ const actionLinks = computed(() => [
     caption: 'Resets & deletes your Daemon',
     icon: 'delete_forever',
     dangerous: true,
-    disable: daemonRef.value?.recovery,
+    // disable: daemonRef.value?.recovery,
     action: () => {
       alertError.value = undefined
       shouldReset.value = false
