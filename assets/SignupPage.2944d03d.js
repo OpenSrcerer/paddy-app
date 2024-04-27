@@ -1,1 +1,0 @@
-import{N as e}from"./NoXyzHere.17c5d711.js";import{d as o,o as t,c as r}from"./index.f822de35.js";import"./QImg.1bb701de.js";import"./render.5b14b30b.js";const _=o({__name:"SignupPage",setup(n){return(a,i)=>(t(),r(e,{title:"Nothing here yet",caption:"Working on it..."}))}});export{_ as default};
