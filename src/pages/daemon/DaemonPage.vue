@@ -272,16 +272,16 @@ const navLinks = [
     route: `/daemon/${daemonId.value}`
   },
   {
-    title: 'Schedules',
-    caption: 'Manage your Daemon\'s schedules',
-    icon: 'alarm',
-    route: `/daemon/${daemonId.value}/schedules`
-  },
-  {
     title: 'Insights',
     caption: 'View your Daemon\'s power statistics',
     icon: 'insights',
     route: `/daemon/${daemonId.value}/statistics`
+  },
+  {
+    title: 'Schedules',
+    caption: 'Manage your Daemon\'s schedules',
+    icon: 'alarm',
+    route: `/daemon/${daemonId.value}/schedules`
   }
 ]
 
