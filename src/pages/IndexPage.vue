@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 100vh" class="column items-center justify-center">
+  <div style="height: 100vh; gap: 10px;" class="column items-center justify-center">
     <h4><b>Welcome to the Paddy App!</b></h4>
     <h6>Log in or sign up to get started!</h6>
 
@@ -13,6 +13,11 @@
 </template>
 
 <script setup lang="ts">
+
+// 1. Make a modal out of the login or put it on the same page as the home page
+// 2. Maybe make borders thinner, and less contrast on the white
+// 3. Consider the switch to material UI
+// 4. On the name edit field... add a better UX to edit it
 
 import { onBeforeMount } from 'vue';
 import { LocalStorage } from 'quasar';
